@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		50B0488620FFB183005AB6D4 /* test_convhull_3d.c in Sources */ = {isa = PBXBuildFile; fileRef = 50B0488520FFB183005AB6D4 /* test_convhull_3d.c */; };
+		50EB06C72100A78C007D7907 /* uniform_sph.c in Sources */ = {isa = PBXBuildFile; fileRef = 50EB06C62100A78C007D7907 /* uniform_sph.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,6 +28,7 @@
 		50B0488420FFB183005AB6D4 /* convhull_3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = convhull_3d.h; path = ../convhull_3d.h; sourceTree = "<group>"; };
 		50B0488520FFB183005AB6D4 /* test_convhull_3d.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_convhull_3d.c; sourceTree = SOURCE_ROOT; };
 		50EB06C521008081007D7907 /* uniform_sph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = uniform_sph.h; sourceTree = "<group>"; };
+		50EB06C62100A78C007D7907 /* uniform_sph.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uniform_sph.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,6 +46,7 @@
 			isa = PBXGroup;
 			children = (
 				50EB06C521008081007D7907 /* uniform_sph.h */,
+				50EB06C62100A78C007D7907 /* uniform_sph.c */,
 				50B0488420FFB183005AB6D4 /* convhull_3d.h */,
 				50B0488520FFB183005AB6D4 /* test_convhull_3d.c */,
 				50B0487B20FFB0DE005AB6D4 /* Products */,
@@ -115,6 +118,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50EB06C72100A78C007D7907 /* uniform_sph.c in Sources */,
 				50B0488620FFB183005AB6D4 /* test_convhull_3d.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
