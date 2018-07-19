@@ -29,7 +29,8 @@
 
 /* Input .obj files */
 /* obtained from: https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html */
-const int nobject_files = 21;
+/* https://graphics.cmlab.csie.ntu.edu.tw/~robin/courses/cg04/model/index.html */
+const int nobject_files = 28;
 const char* obj_folder = "obj_files/";
 const char* output_folder = "output/convhull_";
 const char* obj_test_files[nobject_files] =
@@ -37,15 +38,21 @@ const char* obj_test_files[nobject_files] =
     "airboat",
     "al",
     "alfa147",
+    "ateneam",
     "cessna",
     "cube",
     "diamond",
     "dodecahedron",
+    "elepham",
     "gourd",
     "icosahedron",
+    "lamp",
     "magnolia",
+    "mba1",
+    "mba2",
     "minicooper",
     "power_lines",
+    "roi",
     "sandal",
     "shuttle",
     "skyscraper",
@@ -54,6 +61,7 @@ const char* obj_test_files[nobject_files] =
     "teapot",
     "teddy",
     "trumpet",
+    "venusm",
     "violin_case"
 };
 
