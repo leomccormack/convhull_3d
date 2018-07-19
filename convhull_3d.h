@@ -23,7 +23,7 @@
  * Filename:
  *     convhull_3d.h
  * Description:
- *     A header only C89 implementation of the 3-D quickhull algorithm.
+ *     A header only C implementation of the 3-D quickhull algorithm.
  *     The code is largely derived from the "computational-geometry-toolbox"
  *     by George Papazafeiropoulos (c) 2014, originally distributed under
  *     the BSD (2-clause) license.
@@ -353,7 +353,7 @@ void ismember
                 pOut[i] = 1;
 }
 
-/* Essentially a C version of the 3D convex hull matlab implementation from here:
+/* A C version of the 3D quickhull matlab implementation from here:
  * https://www.mathworks.com/matlabcentral/fileexchange/48509-computational-geometry-toolbox?focused=3851550&tab=example
  * (*out_faces) is returned as NULL, if triangulation fails *
  * Original Copyright (c) 2014, George Papazafeiropoulos

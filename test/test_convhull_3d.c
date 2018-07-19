@@ -25,6 +25,7 @@
 //#define CONVHULL_3D_USE_FLOAT_PRECISION /* optional */
 //#define CONVHULL_3D_USE_CBLAS /* optional */
 #include "convhull_3d.h"
+#include "uniform_sph.h"
 
 /* Input .obj files */
 /* obtained from: https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html */
@@ -63,22 +64,22 @@ int main(int argc, const char * argv[])
     char path[256];
     nFAIL = nSUCCEEDED = 0;
     
-    printf("******************************\n");
+    printf("****************************\n");
     printf("* convhull_3d test program *\n");
-    printf("******************************\n\n");
+    printf("****************************\n\n");
     
     /************************************************
      * TEST: random spherical distribution of points
      ***********************************************/
-    const int n = 936;
+    int n = 936;
     ch_vertex* vertices;
     vertices = (ch_vertex*)malloc(n*sizeof(ch_vertex));
     for (i = 0; i < n; i++) {
-        float azi = rand()/(float)RAND_MAX * M_PI * 2.0;
         float elev = rand()/(float)RAND_MAX * M_PI * 2.0;
-        vertices[i].z = sin(azi) * 1.0f;
-        vertices[i].x = cos(elev) * cos(azi) * rand()/(float)RAND_MAX;
-        vertices[i].y = sin(elev) * cos(azi) * rand()/(float)RAND_MAX;
+        float azi = rand()/(float)RAND_MAX * M_PI * 2.0;
+        vertices[i].z = sin(elev);
+        vertices[i].x = cos(azi) * cos(elev) * rand()/(float)RAND_MAX;
+        vertices[i].y = sin(azi) * cos(elev) * rand()/(float)RAND_MAX;
     }
     printf("TEST: building convexhull of a random spherical distribution");
     convhull_3d_build(vertices, n, &out_faces, &nFaces); /* build hull */
@@ -95,9 +96,96 @@ int main(int argc, const char * argv[])
         convhull_3d_export_obj(vertices, n, out_faces, nFaces, 1, path); /* export as .obj file */
         convhull_3d_export_m(vertices, n, out_faces, nFaces, path); /* export as .m file */
         free(out_faces);
-        free(vertices);
         nSUCCEEDED++;
     }
+    free(vertices);
+    
+    /******************************************************
+     * TEST: uniform distribution of 180 points on a sphere
+     *****************************************************/
+    n = 180;
+    vertices = (ch_vertex*)malloc(n*sizeof(ch_vertex));
+    for (i = 0; i < n; i++) {
+        vertices[i].z = sin(__Tdesign_degree_18_dirs_deg[i][1]*M_PI/180.0f);
+        vertices[i].x = cos(__Tdesign_degree_18_dirs_deg[i][1]*M_PI/180.0f)*cos(__Tdesign_degree_18_dirs_deg[i][0]*M_PI/180.0f);
+        vertices[i].y = cos(__Tdesign_degree_18_dirs_deg[i][1]*M_PI/180.0f)*sin(__Tdesign_degree_18_dirs_deg[i][0]*M_PI/180.0f);
+    }
+    printf("TEST: building convexhull of a 180 point t-design");
+    convhull_3d_build(vertices, n, &out_faces, &nFaces); /* build hull */
+    if(out_faces==NULL){
+        printf("... FAILED!\n");
+        nFAIL++;
+    }
+    else{
+        memset(path,0,strlen(path));
+        path[0] = '\0';
+        strncpy(path, output_folder, strlen(output_folder));
+        strcat(path, "tdesign_180_sph");
+        printf("... SUCCEEDED... exporting...\n");
+        convhull_3d_export_obj(vertices, n, out_faces, nFaces, 1, path); /* export as .obj file */
+        convhull_3d_export_m(vertices, n, out_faces, nFaces, path); /* export as .m file */
+        free(out_faces);
+        nSUCCEEDED++;
+    }
+    free(vertices);
+    
+    /******************************************************
+     * TEST: uniform distribution of 840 points on a sphere
+     *****************************************************/
+    n = 840;
+    vertices = (ch_vertex*)malloc(n*sizeof(ch_vertex));
+    for (i = 0; i < n; i++) {
+        vertices[i].z = sin(__Tdesign_degree_40_dirs_deg[i][1]*M_PI/180.0f);
+        vertices[i].x = cos(__Tdesign_degree_40_dirs_deg[i][1]*M_PI/180.0f)*cos(__Tdesign_degree_40_dirs_deg[i][0]*M_PI/180.0f);
+        vertices[i].y = cos(__Tdesign_degree_40_dirs_deg[i][1]*M_PI/180.0f)*sin(__Tdesign_degree_40_dirs_deg[i][0]*M_PI/180.0f);
+    }
+    printf("TEST: building convexhull of a 840 point t-design");
+    convhull_3d_build(vertices, n, &out_faces, &nFaces); /* build hull */
+    if(out_faces==NULL){
+        printf("... FAILED!\n");
+        nFAIL++;
+    }
+    else{
+        memset(path,0,strlen(path));
+        path[0] = '\0';
+        strncpy(path, output_folder, strlen(output_folder));
+        strcat(path, "tdesign_840_sph");
+        printf("... SUCCEEDED... exporting...\n");
+        convhull_3d_export_obj(vertices, n, out_faces, nFaces, 1, path); /* export as .obj file */
+        convhull_3d_export_m(vertices, n, out_faces, nFaces, path); /* export as .m file */
+        free(out_faces);
+        nSUCCEEDED++;
+    }
+    free(vertices);
+    
+    /*******************************************************
+     * TEST: uniform distribution of 5100 points on a sphere
+     ******************************************************/
+    n = 5100;
+    vertices = (ch_vertex*)malloc(n*sizeof(ch_vertex));
+    for (i = 0; i < n; i++) {
+        vertices[i].z = sin(__Tdesign_degree_100_dirs_deg[i][1]*M_PI/180.0f);
+        vertices[i].x = cos(__Tdesign_degree_100_dirs_deg[i][1]*M_PI/180.0f)*cos(__Tdesign_degree_100_dirs_deg[i][0]*M_PI/180.0f);
+        vertices[i].y = cos(__Tdesign_degree_100_dirs_deg[i][1]*M_PI/180.0f)*sin(__Tdesign_degree_100_dirs_deg[i][0]*M_PI/180.0f);
+    }
+    printf("TEST: building convexhull of a 5100 point t-design");
+    convhull_3d_build(vertices, n, &out_faces, &nFaces); /* build hull */
+    if(out_faces==NULL){
+        printf("... FAILED!\n");
+        nFAIL++;
+    }
+    else{
+        memset(path,0,strlen(path));
+        path[0] = '\0';
+        strncpy(path, output_folder, strlen(output_folder));
+        strcat(path, "tdesign_5100_sph");
+        printf("... SUCCEEDED... exporting...\n");
+        convhull_3d_export_obj(vertices, n, out_faces, nFaces, 1, path); /* export as .obj file */
+        convhull_3d_export_m(vertices, n, out_faces, nFaces, path); /* export as .m file */
+        free(out_faces);
+        nSUCCEEDED++;
+    }
+    free(vertices);
     
     /******************
      * TEST: obj files

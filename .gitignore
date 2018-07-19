@@ -49,3 +49,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+test/output/*.m
