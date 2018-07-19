@@ -54,7 +54,6 @@ Also, if your project has CBLAS linked, then you can speed up the matrix multipl
 
 This repository contains files: 'test/test_convhull_3d.c' and 'test/test_script.m'. The former can be used to generate Convex Hulls of the '.obj' files in 'test/obj_files', which can be subsequently verified in MatLab using the latter file.
 
-![](images/tdesign_5100_sph.png)
 ![](images/teapot_matlab.png)
 
 ## Examples
