@@ -1,12 +1,12 @@
 # Convhull_3d
 
-A header only C implementation of the 3-D quickhull algorithm for building Convex Hulls. The implementation was designed to also work for challenging cases, such as spherical arrangements with nearly-uniformly distributed vertices, where it performs similarly to the MatLab 'convhull' function. The code is also C++ compiler safe.
+A header only C implementation of the 3-D Quickhull algorithm for building Convex Hulls. The implementation was designed to also work for challenging cases, such as spherical arrangements with nearly-uniformly distributed vertices, where it performs similarly to the MatLab 'convhull' function. The code is also MSVC and C++ compiler safe.
 
 ![](images/sph_tdesigns.png)
 
 ## Getting Started
 
-To use this 3-D convexhull implementation in a '.c' or '.cpp' file , simply add the following:
+To use this 3-D Convex Hull implementation in a '.c' or '.cpp' file, simply add the following:
 
 ```c
 #define CONVHULL_3D_ENABLE
@@ -21,21 +21,24 @@ int nVertices;
 extractVerticesFromObjFile(OBJ_FILE_NAME, &vertices, &nVertices);
 ```
 
-Where 'OBJ_FILE_NAME' is the '.obj' file path (without the extention).
+Where 'OBJ_FILE_NAME' is the '.obj' file path (without the extension).
 
-The convexhull may then be built and subsequently exported using this code:
+The Convex Hull may then be built and subsequently exported (including face normals) as an '.obj' file, using this code:
+
 ```c
 int* out_faces = NULL;
 int nFaces;
 convhull_3d_build(vertices, nVertices, &out_faces, &nFaces);
 convhull_3d_export_obj(vertices, nVertices, out_faces, nFaces, 1, OUTPUT_OBJ_FILE_NAME);
+free(vertices);
+free(faces);
 ```
 
-Where 'OUTPUT_OBJ_FILE_NAME' is the output '.obj' file path (without the extention).
+Where 'OUTPUT_OBJ_FILE_NAME' is the output '.obj' file path (without the extension).
 
 ### Additional options
 
-By default, the algorithm uses double floating point precision to build the hull, but it still exports the results in floating point precision. However, one may configure it to use single precision to build the hull (which is less accurate but quicker) by adding the following:
+By default, the algorithm uses double floating point precision to build the hull, but it still exports the results in floating point precision. However, one may configure it to use single precision to build the hull (which is less accurate and reliable, but quicker) by adding the following:
 ```c
 #define CONVHULL_3D_USE_FLOAT_PRECISION /* (optional) */
 #define CONVHULL_3D_ENABLE
@@ -52,7 +55,7 @@ Also, if your project has CBLAS linked, then you can speed up the matrix multipl
 
 ## Test
 
-This repository contains files: 'test/test_convhull_3d.c' and 'test/test_script.m'. The former can be used to generate Convex Hulls of the '.obj' files in 'test/obj_files', which can be subsequently verified in MatLab using the latter file; where the 'convhull_3d.h' implementation is compared with MatLab's built-in 'convhull' function, side-by-side.
+This repository contains files: 'test/test_convhull_3d.c' and 'test/test_script.m'. The former can be used to generate Convex Hulls of the '.obj' files in 'test/obj_files', which can be subsequently verified in MatLab using the latter file; where the 'convhull_3d.h' implementation is compared with MatLab's built-in 'convhull' function, side-by-side. Furthermore, Visual Studio 2017 and Xcode project files have been included in the 'test' folder for convenience.
 
 ![](images/teapot_matlab.png)
 
