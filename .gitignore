@@ -51,3 +51,6 @@ Mkfile.old
 dkms.conf
 
 test/output/*.m
+*.db
+test/test_convhull_3d/.vs/
+test/test_convhull_3d/Debug/

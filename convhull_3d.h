@@ -56,6 +56,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
     
 #ifdef CONVHULL_3D_USE_FLOAT_PRECISION
 typedef float CH_FLOAT;
@@ -124,6 +125,13 @@ void extractVerticesFromObjFile(/* input arguments */
 #include <float.h>
 #include <ctype.h>
 #include <string.h>
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+  #define CV_STRNCPY(a,b,c) strncpy_s(a,c+1,b,c);
+  #define CV_STRCAT(a,b) strcat_s(a,sizeof(b),b);
+#else
+  #define CV_STRNCPY(a,b,c) strncpy(a,b,c);
+  #define CV_STRCAT(a,b) strcat(a,b);
+#endif
 #ifdef CONVHULL_3D_USE_FLOAT_PRECISION
   #define CH_FLT_MIN FLT_MIN
   #define CH_FLT_MAX FLT_MAX
@@ -375,7 +383,7 @@ void convhull_3d_build
     CH_FLOAT dfi, v, max_p, min_p;
     CH_FLOAT* points, *cf, *cfi, *df, *p_s, *span;
     
-    if(nVert<3){
+    if(nVert<3 || in_vertices==NULL){
         (*out_faces) = NULL;
         (*nOut_faces) = 0;
         return;
@@ -825,8 +833,14 @@ void convhull_3d_export_obj
 {
     int i, j;
     char path[256] = "\0";
-    strncpy(path, obj_filename, strlen(obj_filename));
-    FILE* obj_file = fopen(strcat(path, ".obj"), "wt");
+	CV_STRNCPY(path, obj_filename, strlen(obj_filename));
+	FILE* obj_file;
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+	CV_STRCAT(path, ".obj");
+	fopen_s(&obj_file, path, "wt");
+#else
+	obj_file = fopen(strcat(path, ".obj"), "wt");
+#endif
     fprintf(obj_file, "o\n");
     CH_FLOAT scale;
     ch_vec3 v1, v2, normal;
@@ -897,9 +911,15 @@ void convhull_3d_export_m
 )
 {
     int i;
-    char path[256] = "\0";
-    strncpy(path, m_filename, strlen(m_filename));
-    FILE* m_file = fopen(strcat(path, ".m"), "wt");
+	char path[256] = { "\0" }; 
+	memcpy(path, m_filename, strlen(m_filename));
+	FILE* m_file; 
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+	CV_STRCAT(path, ".m");
+	fopen_s(&m_file, path, "wt");
+#else
+	m_file = fopen(strcat(path, ".m"), "wt");
+#endif
     
     /* save face indices and vertices for verification in matlab: */
     fprintf(m_file, "vertices = [\n");
@@ -920,7 +940,12 @@ void convhull_3d_export_m
 void extractVerticesFromObjFile(char* const obj_filename, ch_vertex** out_vertices, int* out_nVert)
 {
     FILE* obj_file;
-    obj_file = fopen(strcat(obj_filename, ".obj"), "r");
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+	CV_STRCAT(obj_filename, ".obj");
+	fopen_s(&obj_file, obj_filename, "r");
+#else
+	obj_file = fopen(strcat(obj_filename, ".obj"), "r");
+#endif 
     
     /* determine number of vertices */
     unsigned int nVert = 0;
@@ -937,22 +962,20 @@ void extractVerticesFromObjFile(char* const obj_filename, ch_vertex** out_vertic
     rewind(obj_file);
     int i=0;
     int vertID, prev_char_isDigit, current_char_isDigit;
-    char vert_char[256];
-    memset(vert_char,0,strlen(vert_char));
-    vert_char[0] = '\0';
+    char vert_char[256] = { 0 }; 
     while (fgets(line, sizeof(line), obj_file)) {
         char* vexists = strstr(line, "v ");
         if(vexists!=NULL){
             prev_char_isDigit = 0;
             vertID = -1;
-            for(int j=0; j<strlen(line); j++){
+            for(int j=0; j<strlen(line)-1; j++){
                 if(isdigit(line[j])||line[j]=='.'||line[j]=='-'||line[j]=='+'||line[j]=='E'||line[j]=='e'){
                     vert_char[strlen(vert_char)] = line[j];
                     current_char_isDigit = 1;
                 }
                 else
                     current_char_isDigit = 0;
-                if((prev_char_isDigit && !current_char_isDigit) || j ==strlen(line)-1 ){
+                if((prev_char_isDigit && !current_char_isDigit) || j ==strlen(line)-2 ){
                     vertID++;
                     if(vertID>4){
                         /* not a valid file */
@@ -962,8 +985,7 @@ void extractVerticesFromObjFile(char* const obj_filename, ch_vertex** out_vertic
                         return;
                     }
                     (*out_vertices)[i].v[vertID] = atof(vert_char);
-                    memset(vert_char,0,strlen(vert_char));
-                    vert_char[0] = '\0';
+					memset(vert_char, 0, 256 * sizeof(char)); 
                 }
                 prev_char_isDigit = current_char_isDigit;
             }

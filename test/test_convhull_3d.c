@@ -20,36 +20,48 @@
  THE SOFTWARE.
 */
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <stdio.h>
+#include <math.h>
 #define CONVHULL_3D_ENABLE
 //#define CONVHULL_3D_USE_FLOAT_PRECISION /* optional */
 //#define CONVHULL_3D_USE_CBLAS /* optional */
 #include "convhull_3d.h"
 #include "uniform_sph.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265359
+#endif
+
+#define PATH_LENGTH 256
+#if _MSC_VER
+const char* output_folder = "../output/convhull_";
+const char* obj_folder = "../obj_files/";
+#else
+const char* output_folder = "output/convhull_";
+const char* obj_folder = "obj_files/";
+#endif
+
 /* Input .obj files */
 /* obtained from: https://people.sc.fsu.edu/~jburkardt/data/obj/obj.html */
 /* https://graphics.cmlab.csie.ntu.edu.tw/~robin/courses/cg04/model/index.html */
-const int nobject_files = 28;
-const char* obj_folder = "obj_files/";
-const char* output_folder = "output/convhull_";
-const char* obj_test_files[nobject_files] =
+#define N_OBJECT_FILES 24
+const char* obj_test_files[N_OBJECT_FILES] =
 {
     "airboat",
     "al",
-    "alfa147",
     "ateneam",
     "cessna",
     "cube",
     "diamond",
     "dodecahedron",
-    "elepham",
     "gourd",
     "icosahedron",
     "lamp",
     "magnolia",
-    "mba1",
-    "mba2",
     "minicooper",
     "power_lines",
     "roi",
@@ -69,7 +81,7 @@ int main(int argc, const char * argv[])
 {
     int o, i, nFAIL, nSUCCEEDED, nFaces, nVert;
     int* out_faces = NULL;
-    char path[256];
+    char path[PATH_LENGTH];
     nFAIL = nSUCCEEDED = 0;
     
     printf("****************************\n");
@@ -96,7 +108,7 @@ int main(int argc, const char * argv[])
         nFAIL++;
     }
     else{
-        memset(path,0,strlen(path));
+        memset(path,0, PATH_LENGTH*sizeof(char));
         path[0] = '\0';
         strncpy(path, output_folder, strlen(output_folder));
         strcat(path, "rand_sph");
@@ -125,7 +137,7 @@ int main(int argc, const char * argv[])
         nFAIL++;
     }
     else{
-        memset(path,0,strlen(path));
+		memset(path, 0, PATH_LENGTH * sizeof(char));
         path[0] = '\0';
         strncpy(path, output_folder, strlen(output_folder));
         strcat(path, "tdesign_180_sph");
@@ -154,7 +166,7 @@ int main(int argc, const char * argv[])
         nFAIL++;
     }
     else{
-        memset(path,0,strlen(path));
+		memset(path, 0, PATH_LENGTH * sizeof(char));
         path[0] = '\0';
         strncpy(path, output_folder, strlen(output_folder));
         strcat(path, "tdesign_840_sph");
@@ -183,7 +195,7 @@ int main(int argc, const char * argv[])
         nFAIL++;
     }
     else{
-        memset(path,0,strlen(path));
+		memset(path, 0, PATH_LENGTH * sizeof(char));
         path[0] = '\0';
         strncpy(path, output_folder, strlen(output_folder));
         strcat(path, "tdesign_5100_sph");
@@ -198,8 +210,8 @@ int main(int argc, const char * argv[])
     /******************
      * TEST: obj files
      *****************/
-    for(o=0; o<nobject_files; o++){
-        memset(path,0,strlen(path));
+    for(o=0; o<N_OBJECT_FILES; o++){
+		memset(path, 0, PATH_LENGTH * sizeof(char));
         path[0] = '\0';
         strcat(path, obj_folder);
         strcat(path, obj_test_files[o]);
@@ -212,7 +224,7 @@ int main(int argc, const char * argv[])
             nFAIL++;
         }
         else{
-            memset(path,0,strlen(path));
+			memset(path, 0, PATH_LENGTH * sizeof(char));
             path[0] = '\0';
             strncpy(path, output_folder, strlen(output_folder));
             strcat(path, (char*)obj_test_files[o]);
