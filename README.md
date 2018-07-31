@@ -58,7 +58,7 @@ Also, if your project has CBLAS linked, then you can speed up the matrix multipl
 
 This repository contains files: 'test/test_convhull_3d.c' and 'test/test_script.m'. The former can be used to generate Convex Hulls of the '.obj' files in 'test/obj_files', which can be subsequently verified in MatLab using the latter file; where the 'convhull_3d.h' implementation is compared with MatLab's built-in 'convhull' function, side-by-side. Furthermore, Visual Studio 2017 and Xcode project files have been included in the 'test' folder for convenience.
 
-Additionally, based on informal testing, this 'convhull_3d' implementation was found to be the most stable and reliable C implementation of the Quickhull algorithm tested by the author; with the exception of the large and cumbersome Qhull library, which performed similarly. However, the main reason for its inception was largely due to the fact that most popular 'light' implementations, that were auditioned by the author beforehand, were not capable of identifying all of the faces for many uniformly distributed spherical arrangements; something which was required for a particular project at the time.
+Note that the main reason for the inception of 'convhull_3d', was largely due to the fact that some popular 'light' C implementations of the Quickhull algorithm (that were auditioned by the author beforehand) were not capable of identifying all of the faces for many uniformly distributed spherical arrangements; something which was required for a particular project at the time.
 
 ![](images/teapot_matlab.png)
 
@@ -72,7 +72,7 @@ The 'test/test_convhull_3d.c' file may also serve as example usage of the convhu
 
 ## Future work
 
-Since the calculation of the Convex Hull is quite a substantial part of the Delaunay triangulation and Voronoi diagram algorithms, the additional effort to implement them is relatively low. Therefore, they will probably be added to the implementation in the future.
+Possibly add the Delaunay triangulation and Voronoi diagram algorithms, as the additional effort to implement them is relatively low.
 
 ## License
 

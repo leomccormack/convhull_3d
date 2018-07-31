@@ -141,9 +141,6 @@ void extractVerticesFromObjFile(/* input arguments */
   #define CH_FLT_MAX DBL_MAX
   #define CH_NOISE_VAL 0.0000001
 #endif
-#ifdef CONVHULL_3D_USE_CBLAS
-  #include <cblas.h>
-#endif
 #ifndef MIN
   #define MIN(a,b) (( (a) < (b) ) ? (a) : (b) )
 #endif
@@ -164,18 +161,19 @@ typedef struct int_w_idx {
 }int_w_idx;
 
 /* internal functions prototypes: */
-int cmp_asc_float(const void*, const void*);
-int cmp_desc_float(const void*, const void*);
-int cmp_asc_int(const void*, const void*);
-int cmp_desc_int(const void*, const void*);
-void sort_float(CH_FLOAT*, CH_FLOAT*, int*, int, int);
-void sort_int(int*, int*, int*, int, int);
-ch_vec3 cross(ch_vec3*, ch_vec3*);
-CH_FLOAT det_4x4(CH_FLOAT*);
-void plane_3d(CH_FLOAT*, CH_FLOAT*, CH_FLOAT*);
+static int cmp_asc_float(const void*, const void*);
+static int cmp_desc_float(const void*, const void*);
+static int cmp_asc_int(const void*, const void*);
+static int cmp_desc_int(const void*, const void*);
+static void sort_float(CH_FLOAT*, CH_FLOAT*, int*, int, int);
+static void sort_int(int*, int*, int*, int, int);
+static ch_vec3 cross(ch_vec3*, ch_vec3*);
+static CH_FLOAT det_4x4(CH_FLOAT*);
+static void plane_3d(CH_FLOAT*, CH_FLOAT*, CH_FLOAT*);
+static void ismember(int*, int*, int*, int, int);
 
 /* internal functions definitions: */
-int cmp_asc_float(const void *a,const void *b) {
+static int cmp_asc_float(const void *a,const void *b) {
     struct float_w_idx *a1 = (struct float_w_idx*)a;
     struct float_w_idx *a2 = (struct float_w_idx*)b;
     if((*a1).val<(*a2).val)return -1;
@@ -183,7 +181,7 @@ int cmp_asc_float(const void *a,const void *b) {
     else return 0;
 }
 
-int cmp_desc_float(const void *a,const void *b) {
+static int cmp_desc_float(const void *a,const void *b) {
     struct float_w_idx *a1 = (struct float_w_idx*)a;
     struct float_w_idx *a2 = (struct float_w_idx*)b;
     if((*a1).val>(*a2).val)return -1;
@@ -191,7 +189,7 @@ int cmp_desc_float(const void *a,const void *b) {
     else return 0;
 }
 
-int cmp_asc_int(const void *a,const void *b) {
+static int cmp_asc_int(const void *a,const void *b) {
     struct int_w_idx *a1 = (struct int_w_idx*)a;
     struct int_w_idx *a2 = (struct int_w_idx*)b;
     if((*a1).val<(*a2).val)return -1;
@@ -199,7 +197,7 @@ int cmp_asc_int(const void *a,const void *b) {
     else return 0;
 }
 
-int cmp_desc_int(const void *a,const void *b) {
+static int cmp_desc_int(const void *a,const void *b) {
     struct int_w_idx *a1 = (struct int_w_idx*)a;
     struct int_w_idx *a2 = (struct int_w_idx*)b;
     if((*a1).val>(*a2).val)return -1;
@@ -207,7 +205,7 @@ int cmp_desc_int(const void *a,const void *b) {
     else return 0;
 }
 
-void sort_float
+static void sort_float
 (
     CH_FLOAT* in_vec,  /* vector[len] to be sorted */
     CH_FLOAT* out_vec, /* if NULL, then in_vec is sorted "in-place" */
@@ -239,7 +237,7 @@ void sort_float
     free(data);
 }
 
-void sort_int
+static void sort_int
 (
     int* in_vec,     /* vector[len] to be sorted */
     int* out_vec,    /* if NULL, then in_vec is sorted "in-place" */
@@ -271,7 +269,7 @@ void sort_int
     free(data);
 }
 
-ch_vec3 cross(ch_vec3* v1, ch_vec3* v2)
+static ch_vec3 cross(ch_vec3* v1, ch_vec3* v2)
 {
     ch_vec3 cross;
     cross.x = v1->y * v2->z - v1->z * v2->y;
@@ -281,7 +279,7 @@ ch_vec3 cross(ch_vec3* v1, ch_vec3* v2)
 }
 
 /* calculates the determinent of a 4x4 matrix */
-CH_FLOAT det_4x4(CH_FLOAT* m) {
+static CH_FLOAT det_4x4(CH_FLOAT* m) {
     return
     m[3] * m[6] * m[9] * m[12] - m[2] * m[7] * m[9] * m[12] -
     m[3] * m[5] * m[10] * m[12] + m[1] * m[7] * m[10] * m[12] +
@@ -301,7 +299,7 @@ CH_FLOAT det_4x4(CH_FLOAT* m) {
  * Original Copyright (c) 2014, George Papazafeiropoulos
  * Distributed under the BSD (2-clause) license
  */
-void plane_3d
+static void plane_3d
 (
     CH_FLOAT* p,
     CH_FLOAT* c,
@@ -344,7 +342,7 @@ void plane_3d
         (*d) += -p[i] * c[i];
 }
 
-void ismember
+static void ismember
 (
     int* pLeft,          /* left vector; nLeftElements x 1 */
     int* pRight,         /* right vector; nRightElements x 1 */
