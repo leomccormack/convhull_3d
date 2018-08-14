@@ -1,17 +1,19 @@
-# Convhull_3d
+# convhull_3d
 
-A header only C implementation of the 3-D Quickhull algorithm for building Convex Hulls. The implementation also works for uniformly distributed spherical arrangements of vertices, where it performs similarly to the MatLab 'convhull' function. The code is also MSVC and C++ compiler safe.
+A header only C implementation of the 3-D Quickhull algorithm for building Convex Hulls. The code is also MSVC and C++ compiler safe.
 
-![](images/sph_tdesigns.png)
+![](images/teapot_example.png)
 
 ## Getting Started
 
-To use this 3-D Convex Hull implementation in a '.c' or '.cpp' file, simply add the following:
+To use this 3-D Convex Hull implementation in a '.c' or '.cpp' file, first add the following:
 
 ```c
 #define CONVHULL_3D_ENABLE
 #include "convhull_3d.h"
 ```
+
+### Specify input vertices
 
 Then specify the vertices, which can be optionally extracted from an '.obj' file using the following code:
 
@@ -19,9 +21,27 @@ Then specify the vertices, which can be optionally extracted from an '.obj' file
 ch_vertex* vertices = NULL;
 int nVertices;
 extractVerticesFromObjFile(OBJ_FILE_NAME, &vertices, &nVertices);
+/* Where 'vertices' is a vector of vertices [nVertices].x, .y, .z  */
 ```
 
 Where 'OBJ_FILE_NAME' is the '.obj' file path (without the extension).
+
+Or they may be defined manually, for example: a random distribution of points on the unit sphere:
+
+```c
+int n = 936;
+ch_vertex* vertices;
+vertices = (ch_vertex*)malloc(n*sizeof(ch_vertex));
+for (i = 0; i < n; i++) {
+    float elev = rand()/(float)RAND_MAX * M_PI * 2.0;
+    float azi = rand()/(float)RAND_MAX * M_PI * 2.0;
+    vertices[i].x = cos(azi) * cos(elev) * rand()/(float)RAND_MAX;
+    vertices[i].y = sin(azi) * cos(elev) * rand()/(float)RAND_MAX;
+    vertices[i].z = sin(elev);
+}
+```
+
+### Build the Convex Hull
 
 The Convex Hull may then be built and subsequently exported (including face normals) as an '.obj' file, using this code:
 
@@ -58,17 +78,18 @@ Also, if your project has CBLAS linked, then you can speed up the matrix multipl
 
 This repository contains files: 'test/test_convhull_3d.c' and 'test/test_script.m'. The former can be used to generate Convex Hulls of the '.obj' files in 'test/obj_files', which can be subsequently verified in MatLab using the latter file; where the 'convhull_3d.h' implementation is compared with MatLab's built-in 'convhull' function, side-by-side. Furthermore, Visual Studio 2017 and Xcode project files have been included in the 'test' folder for convenience.
 
-Note that the main reason for the inception of 'convhull_3d', was largely due to the fact that some popular 'light' C implementations of the Quickhull algorithm (that were auditioned by the author beforehand) were not capable of identifying all of the faces for many uniformly distributed spherical arrangements; something which was required for a particular project at the time.
+Note that the main reason for the inception of 'convhull_3d', was largely due to the fact that some popular 'light' C implementations of the Quickhull algorithm (that were auditioned by the author beforehand) were not capable of identifying all of the faces for many uniformly distributed spherical arrangements; something which was required for a particular project at the time. Therefore, if you also need to build Convex Hulls for this particular task, then this implementation is especially recommended.
 
 ![](images/teapot_matlab.png)
 
 ## Examples
 
-The 'test/test_convhull_3d.c' file may also serve as example usage of the convhull_3d implementation. The following images are depictions of the generated .obj files, using Tim Maxwell's OBJ Viewer:
+The 'test/test_convhull_3d.c' file may also serve as example usage of the convhull_3d implementation. The following images are of the original 'obj' files (left) and the corresponding Convex Hulls (right), depicted using Tim Maxwell's OBJ Viewer:
 
-![](images/teapot.png)
+![](images/sph_tdesigns.png)
 ![](images/violin_case.png)
-![](images/sandal.png)
+![](images/sandal_example.png)
+![](images/trumpet_example.png)
 
 ## Future work
 
@@ -80,4 +101,4 @@ The code is distributed under the MIT license, but contains code that was origin
 
 ## Contact
 
-If you have any questions, or spot any bugs, please email: leo.mccormack@aalto.fi
+If you have any questions, or encounter any bugs, please email: leo.mccormack@aalto.fi
