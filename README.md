@@ -87,10 +87,12 @@ Note that the main reason for the inception of 'convhull_3d', was largely due to
 
 The 'test/test_convhull_3d.c' file may also serve as example usage of the convhull_3d implementation. The following images are of the original 'obj' files (left) and the corresponding Convex Hulls (right), depicted using Tim Maxwell's OBJ Viewer:
 
-![](images/sph_tdesigns.png)
 ![](images/violincase_example.png)
 ![](images/sandal_example.png)
 ![](images/trumpet_example.png)
+
+Convex Hulls of uniformly distributed points on a sphere, which results in the Delaunay triangulation of the points for this special case (180, 840, 5100 points left-to-right):
+![](images/sph_tdesigns.png)
 
 ## Future work
 
