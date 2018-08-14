@@ -59,7 +59,7 @@ Where 'OUTPUT_OBJ_FILE_NAME' is the output '.obj' file path (without the extensi
 
 ### Additional options
 
-By default, the implementation uses double floating point precision to build the hull, but it still exports the results in single floating point precision. However, one may configure convhull_3d to use single precision to build the hull (which is less accurate and reliable, but quicker) by adding the following:
+By default, the implementation uses double floating point precision to build the hull, while still exporting the results in single floating point precision. However, one may configure convhull_3d to use single precision to build the hull (which is less accurate and reliable, but quicker) by adding the following:
 ```c
 #define CONVHULL_3D_USE_FLOAT_PRECISION /* (optional) */
 #define CONVHULL_3D_ENABLE
@@ -76,10 +76,11 @@ Also, if your project has CBLAS linked, then you can speed up the matrix multipl
 
 ## Test
 
-This repository contains files: 'test/test_convhull_3d.c' and 'test/test_script.m'. The former can be used to generate Convex Hulls of the '.obj' files in 'test/obj_files', which can be subsequently verified in MatLab using the latter file; where the 'convhull_3d.h' implementation is compared with MatLab's built-in 'convhull' function, side-by-side. Furthermore, Visual Studio 2017 and Xcode project files have been included in the 'test' folder for convenience.
+This repository contains files: 'test/test_convhull_3d.c' and 'test/test_script.m'. The former can be used to generate Convex Hulls of the '.obj' files located in the 'test/obj_files' folder, which can be subsequently verified in MatLab using the latter file; where the 'convhull_3d.h' implementation is compared with MatLab's built-in 'convhull' function, side-by-side. Furthermore, Visual Studio 2017 and Xcode project files have been included in the 'test' folder for convenience.
 
 Note that the main reason for the inception of 'convhull_3d', was largely due to the fact that some popular 'light' C implementations of the Quickhull algorithm (that were auditioned by the author beforehand) were not capable of identifying all of the faces for many uniformly distributed spherical arrangements; something which was required for a particular project at the time. Therefore, if you also need to build Convex Hulls for this particular task, then this implementation is especially recommended.
 
+![](images/tdesign_5100_sph.png)
 ![](images/teapot_matlab.png)
 
 ## Examples
@@ -87,7 +88,7 @@ Note that the main reason for the inception of 'convhull_3d', was largely due to
 The 'test/test_convhull_3d.c' file may also serve as example usage of the convhull_3d implementation. The following images are of the original 'obj' files (left) and the corresponding Convex Hulls (right), depicted using Tim Maxwell's OBJ Viewer:
 
 ![](images/sph_tdesigns.png)
-![](images/violin_case.png)
+![](images/violincase_example.png)
 ![](images/sandal_example.png)
 ![](images/trumpet_example.png)
 
