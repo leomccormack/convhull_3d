@@ -15,7 +15,7 @@ To use this 3-D Convex Hull implementation in a '.c' or '.cpp' file, first add t
 
 ### Specify input vertices
 
-Then specify the vertices, which can be optionally extracted from an '.obj' file using the following code:
+The vertices can be optionally extracted from an '.obj' file using the following code:
 
 ```c
 ch_vertex* vertices = NULL;
@@ -78,8 +78,6 @@ Also, if your project has CBLAS linked, then you can speed up the matrix multipl
 
 This repository contains files: 'test/test_convhull_3d.c' and 'test/test_script.m'. The former can be used to generate Convex Hulls of the '.obj' files located in the 'test/obj_files' folder, which can be subsequently verified in MatLab using the latter file; where the 'convhull_3d.h' implementation is compared with MatLab's built-in 'convhull' function, side-by-side. Furthermore, Visual Studio 2017 and Xcode project files have been included in the 'test' folder for convenience.
 
-Note that the main reason for the inception of 'convhull_3d', was largely due to the fact that some popular 'light' C implementations of the Quickhull algorithm (that were auditioned by the author beforehand) were not capable of identifying all of the faces for many uniformly distributed spherical arrangements; something which was required for a particular project at the time. Therefore, if you also need to build Convex Hulls for this particular task, then this implementation is especially recommended.
-
 ![](images/tdesign_5100_sph.png)
 ![](images/teapot_matlab.png)
 
@@ -91,7 +89,8 @@ The 'test/test_convhull_3d.c' file may also serve as example usage of the convhu
 ![](images/sandal_example.png)
 ![](images/trumpet_example.png)
 
-Convex Hulls of uniformly distributed points on a sphere, which results in the Delaunay triangulation of the points for this special case (180, 840, 5100 points left-to-right):
+Convex Hulls of uniformly distributed points on a sphere (180, 840, 5100 points left-to-right):
+
 ![](images/sph_tdesigns.png)
 
 ## Future work
