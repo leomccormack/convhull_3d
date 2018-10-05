@@ -1,6 +1,6 @@
 # convhull_3d
 
-A header only C implementation of the 3-D Quickhull algorithm for building Convex Hulls. The code is also MSVC and C++ compiler safe.
+A header only C implementation of the 3-D Quickhull algorithm for building Convex Hulls. The code is also MSVC-C89 and C++ compiler compliant.
 
 ![](images/teapot_example.png)
 
@@ -13,9 +13,7 @@ To use this 3-D Convex Hull implementation in a '.c' or '.cpp' file, first add t
 #include "convhull_3d.h"
 ```
 
-### Specify input vertices
-
-The vertices can be optionally extracted from an '.obj' file using the following code:
+Then specify the vertices, which can be optionally extracted from an '.obj' file using the following code:
 
 ```c
 ch_vertex* vertices = NULL;
@@ -24,7 +22,7 @@ extractVerticesFromObjFile(OBJ_FILE_NAME, &vertices, &nVertices);
 /* Where 'vertices' is a vector of vertices [nVertices].x, .y, .z  */
 ```
 
-Where 'OBJ_FILE_NAME' is the '.obj' file path (without the extension).
+where 'OBJ_FILE_NAME' is the '.obj' file path (without the extension).
 
 Or they may be defined manually, for example: a random distribution of points on the unit sphere:
 
@@ -41,8 +39,6 @@ for (i = 0; i < n; i++) {
 }
 ```
 
-### Build the Convex Hull
-
 The Convex Hull may then be built and subsequently exported (including face normals) as an '.obj' file, using this code:
 
 ```c
@@ -55,7 +51,7 @@ free(vertices);
 free(faceIndices);
 ```
 
-Where 'OUTPUT_OBJ_FILE_NAME' is the output '.obj' file path (without the extension).
+where 'OUTPUT_OBJ_FILE_NAME' is the output '.obj' file path (without the extension).
 
 ### Additional options
 
@@ -66,7 +62,7 @@ By default, the implementation uses double floating point precision to build the
 #include "convhull_3d.h"
 ```
 
-Also, if your project has CBLAS linked, then you can speed up the matrix multiplications by adding:
+If your project has CBLAS linked, then you may also speed up the matrix multiplications by adding:
 ```c
 #define CONVHULL_3D_USE_CBLAS /* (optional) */
 #define CONVHULL_3D_USE_FLOAT_PRECISION /* (optional) */
