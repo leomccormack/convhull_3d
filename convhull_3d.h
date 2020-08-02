@@ -60,8 +60,12 @@ extern "C" {
     
 #ifdef CONVHULL_3D_USE_FLOAT_PRECISION
 typedef float CH_FLOAT;
+#define ch_pow powf
+#define ch_sqrt sqrtf
 #else
 typedef double CH_FLOAT;
+#define ch_pow pow
+#define ch_sqrt sqrt
 #endif
 typedef struct _ch_vertex {
     union {
@@ -333,8 +337,8 @@ static void plane_3d
     }
     norm_c = (CH_FLOAT)0.0;
     for(i=0; i<3; i++)
-        norm_c += (pow(c[i], 2.0));
-    norm_c = sqrt(norm_c);
+        norm_c += (ch_pow(c[i], 2.0));
+    norm_c = ch_sqrt(norm_c);
     for(i=0; i<3; i++)
         c[i] /= norm_c;
     (*d) = (CH_FLOAT)0.0;
@@ -392,7 +396,7 @@ void convhull_3d_build
     d = 3;
     span = (CH_FLOAT*)malloc(d*sizeof(CH_FLOAT));
     for(j=0; j<d; j++){
-        max_p = 2.23e-13; min_p = 2.23e+13;
+        max_p = (CH_FLOAT)2.23e-13; min_p = (CH_FLOAT)2.23e+13;
         for(i=0; i<nVert; i++){
             max_p = MAX(max_p, in_vertices[i].v[j]);
             min_p = MIN(min_p, in_vertices[i].v[j]);
@@ -508,7 +512,7 @@ void convhull_3d_build
     desReldist = (CH_FLOAT*)malloc((nVert-d-1) * sizeof(CH_FLOAT));
     for(i=0; i<(nVert-d-1); i++)
         for(j=0; j<d; j++)
-            reldist[i] += pow(absdist[i*d+j], 2.0);
+            reldist[i] += ch_pow(absdist[i*d+j], 2.0);
     
     /* Sort from maximum to minimum relative distance */
     int num_pleft, cnt;
@@ -870,7 +874,7 @@ void convhull_3d_export_obj
         normal = cross(&v1, &v2);
         
         /* normalise to unit length */
-        scale = 1.0/(sqrt(pow(normal.x, 2.0)+pow(normal.y, 2.0)+pow(normal.z, 2.0))+2.23e-9);
+        scale = ((CH_FLOAT)1.0)/(ch_sqrt(ch_pow(normal.x, (CH_FLOAT)2.0)+ch_pow(normal.y, (CH_FLOAT)2.0)+ch_pow(normal.z, (CH_FLOAT)2.0))+(CH_FLOAT)2.23e-9);
         normal.x *= scale;
         normal.y *= scale;
         normal.z *= scale;
@@ -925,7 +929,7 @@ void convhull_3d_export_m
         fprintf(m_file, "%f, %f, %f;\n", vertices[i].x, vertices[i].y, vertices[i].z);
     fprintf(m_file, "];\n\n\n");
     fprintf(m_file, "faces = [\n");
-    for (int i = 0; i < nFaces; i++) {
+    for (i = 0; i < nFaces; i++) {
         fprintf(m_file, " %u, %u, %u;\n",
                 faces[3*i+0]+1,
                 faces[3*i+1]+1,
@@ -966,7 +970,7 @@ void extractVerticesFromObjFile(char* const obj_filename, ch_vertex** out_vertic
         if(vexists!=NULL){
             prev_char_isDigit = 0;
             vertID = -1;
-            for(int j=0; j<strlen(line)-1; j++){
+            for(size_t j=0; j<strlen(line)-1; j++){
                 if(isdigit(line[j])||line[j]=='.'||line[j]=='-'||line[j]=='+'||line[j]=='E'||line[j]=='e'){
                     vert_char[strlen(vert_char)] = line[j];
                     current_char_isDigit = 1;
@@ -982,7 +986,7 @@ void extractVerticesFromObjFile(char* const obj_filename, ch_vertex** out_vertic
                         (*out_nVert) = 0;
                         return;
                     }
-                    (*out_vertices)[i].v[vertID] = atof(vert_char);
+                    (*out_vertices)[i].v[vertID] = (CH_FLOAT)atof(vert_char);
 					memset(vert_char, 0, 256 * sizeof(char)); 
                 }
                 prev_char_isDigit = current_char_isDigit;
