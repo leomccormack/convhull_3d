@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <unistd.h>
 #define CONVHULL_3D_ENABLE
 //#define CONVHULL_3D_USE_FLOAT_PRECISION /* optional */
 //#define CONVHULL_3D_USE_CBLAS /* optional */
@@ -87,6 +88,15 @@ int main(int argc, const char * argv[])
     printf("****************************\n");
     printf("* convhull_3d test program *\n");
     printf("****************************\n\n");
+
+    /* Working directory should be where this test program resides. If not, then change the working directory in the Xcode Scheme settings */
+    char cwd[256];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Current working dir: %s\n", cwd);
+    } else {
+        perror("getcwd() error");
+        return 1;
+    }
     
     /************************************************
      * TEST: random spherical distribution of points

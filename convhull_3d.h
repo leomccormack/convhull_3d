@@ -142,6 +142,8 @@ void extractVerticesFromObjFile(/* input arguments */
 #include <float.h>
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
+#include <unistd.h>
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
   #define CV_STRNCPY(a,b,c) strncpy_s(a,c+1,b,c);
   #define CV_STRCAT(a,b) strcat_s(a,sizeof(b),b);
@@ -854,8 +856,13 @@ void convhull_3d_export_obj
 	CV_STRCAT(path, ".obj");
 	fopen_s(&obj_file, path, "wt");
 #else
+    errno = 0;
 	obj_file = fopen(strcat(path, ".obj"), "wt");
 #endif
+    if (obj_file==NULL) {
+        printf("Error %d \n", errno);
+        printf("It's null");
+    }
     fprintf(obj_file, "o\n");
     CH_FLOAT scale;
     ch_vec3 v1, v2, normal;
