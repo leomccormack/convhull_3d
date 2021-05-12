@@ -142,8 +142,8 @@ void extractVerticesFromObjFile(/* input arguments */
 #include <float.h>
 #include <ctype.h>
 #include <string.h>
-#include <errno.h>
-#include <unistd.h>
+#include <errno.h> 
+#include <assert.h>
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
   #define CV_STRNCPY(a,b,c) strncpy_s(a,c+1,b,c);
   #define CV_STRCAT(a,b) strcat_s(a,sizeof(b),b);
@@ -409,20 +409,25 @@ void convhull_3d_build
     /* 3 dimensions. The code should theoretically work for >=2 dimensions, but "plane_3d" and "det_4x4" are hardcoded for 3,
      * so would need to be rewritten */
     d = 3;
-    span = (CH_FLOAT*)ch_malloc(d*sizeof(CH_FLOAT));
-    for(j=0; j<d; j++){
-        max_p = (CH_FLOAT)2.23e-13; min_p = (CH_FLOAT)2.23e+13;
-        for(i=0; i<nVert; i++){
-            max_p = MAX(max_p, in_vertices[i].v[j]);
-            min_p = MIN(min_p, in_vertices[i].v[j]);
-        }
-        span[j] = max_p - min_p;
-    }
-    points = (CH_FLOAT*)ch_malloc(nVert*(d+1)*sizeof(CH_FLOAT));
+
+    /* Add noise to the points */
+    points = (CH_FLOAT*)malloc(nVert*(d+1)*sizeof(CH_FLOAT));
     for(i=0; i<nVert; i++){
         for(j=0; j<d; j++)
-            points[i*(d+1)+j] = in_vertices[i].v[j] + CH_NOISE_VAL*rand()/(float)RAND_MAX; /* noise mitigates duplicates */
+            points[i*(d+1)+j] = in_vertices[i].v[j] + CH_NOISE_VAL*rand()/(CH_FLOAT)RAND_MAX; /* noise mitigates duplicates */
         points[i*(d+1)+d] = 1.0f; /* add a last column of ones. Used only for determinant calculation */
+    }
+
+    /* Find the span */
+    span = (CH_FLOAT*)malloc(d*sizeof(CH_FLOAT));
+    for(j=0; j<d; j++){
+        max_p = -2.23e+13; min_p = 2.23e+13;
+        for(i=0; i<nVert; i++){
+            max_p = MAX(max_p, points[i*(d+1)+j]);
+            min_p = MIN(min_p, points[i*(d+1)+j]);
+        }
+        span[j] = max_p - min_p;
+        assert(span[j]>0.0000001f);
     }
     
     /* The initial convex hull is a simplex with (d+1) facets, where d is the number of dimensions */
@@ -458,7 +463,8 @@ void convhull_3d_build
         df[i] = dfi;
     }
     CH_FLOAT *A;
-    int *bVec, *fVec, *asfVec, *face_tmp;
+    int *bVec, *fVec, *asfVec;
+    int face_tmp[2];
     
     /* Check to make sure that faces are correctly oriented */
     bVec = (int*)ch_malloc(4*sizeof(int));
@@ -467,7 +473,6 @@ void convhull_3d_build
     
     /* A contains the coordinates of the points forming a simplex */
     A = (CH_FLOAT*)ch_calloc((d+1)*(d+1), sizeof(CH_FLOAT));
-    face_tmp = (int*)ch_malloc((d+1)*sizeof(int));
     fVec = (int*)ch_malloc((d+1)*sizeof(int));
     asfVec = (int*)ch_malloc((d+1)*sizeof(int));
     for(k=0; k<(d+1); k++){
@@ -489,10 +494,10 @@ void convhull_3d_build
         /* Orient so that each point on the original simplex can't see the opposite face */
         if(v<0){
             /* Reverse the order of the last two vertices to change the volume */
-            for(j=0; j<d; j++)
-                face_tmp[j] = faces[k*d+j];
-            for(j=0, l=d-2; j<d-1; j++, l++)
-                faces[k*d+l] = face_tmp[d-j-1];
+            for(j=0; j<2; j++)
+                face_tmp[j] = faces[k*d+d-j-1];
+            for(j=0; j<2; j++)
+                faces[k*d+d-j-1] = face_tmp[1-j];
             
             /* Modify the plane coefficients of the properly oriented faces */
             for(j=0; j<d; j++)
@@ -771,10 +776,10 @@ void convhull_3d_build
                 /* Orient faces so that each point on the original simplex can't see the opposite face */
                 if (detA<0.0){
                     /* If orientation is improper, reverse the order to change the volume sign */
-                    for(j=0; j<d; j++)
-                        face_tmp[j] = faces[k*d+j];
-                    for(j=0, l=d-2; j<d-1; j++, l++)
-                        faces[k*d+l] = face_tmp[d-j-1];
+                    for(j=0; j<2; j++)
+                        face_tmp[j] = faces[k*d+d-j-1];
+                    for(j=0; j<2; j++)
+                        faces[k*d+d-j-1] = face_tmp[1-j];
                     
                     /* Modify the plane coefficients of the properly oriented faces */
                     for(j=0; j<d; j++)
@@ -786,10 +791,16 @@ void convhull_3d_build
                     for(; l<d+1; l++)
                         for(j=0; j<d+1; j++)
                             A[l*(d+1)+j] = points[pp[index]*(d+1)+j];
+#ifndef NDEBUG
+                    /* Check */
+                    detA = det_4x4(A); 
+                    assert(detA>0.0);
+#endif
                 }
                 ch_free(pp);
             }
-            ch_free(horizon);
+            if(horizon_size1>0)
+                ch_free(horizon);
             ch_free(f0);
             ch_free(nonvisible_faces);
             ch_free(visible);
@@ -831,7 +842,6 @@ void convhull_3d_build
     ch_free(cfi);
     ch_free(df);
     ch_free(p_s);
-    ch_free(face_tmp);
     ch_free(fVec);
     ch_free(asfVec);
     ch_free(bVec);
