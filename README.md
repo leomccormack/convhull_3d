@@ -1,6 +1,8 @@
 # convhull_3d
 
-A header only C implementation of the 3-D Quickhull algorithm for building Convex Hulls. The code is also MSVC-C89 and C++ compiler compliant.
+A header only C implementation of the 3-D Quickhull algorithm for building Convex Hulls. The code is also compliant with MSVC and C++ compilers.
+
+**New! As of 28.05.2021:** Added support for building N-dimensional Convex hulls and Delaunay meshes.
 
 ![](images/teapot_example.png)
 
@@ -57,7 +59,7 @@ where 'OUTPUT_OBJ_FILE_NAME' is the output '.obj' file path (without the extensi
 
 By default, the implementation uses double floating point precision to build the hull, while still exporting the results in single floating point precision. However, one may configure convhull_3d to use single precision to build the hull (which is less accurate and reliable, but quicker) by adding the following:
 ```c
-#define CONVHULL_3D_USE_FLOAT_PRECISION /* (optional) */
+#define CONVHULL_3D_USE_SINGLE_PRECISION /* (optional) */
 #define CONVHULL_3D_ENABLE
 #include "convhull_3d.h"
 ```
@@ -65,7 +67,7 @@ By default, the implementation uses double floating point precision to build the
 If your project has CBLAS linked, then you may also speed up the matrix multiplications by adding:
 ```c
 #define CONVHULL_3D_USE_CBLAS /* (optional) */
-#define CONVHULL_3D_USE_FLOAT_PRECISION /* (optional) */
+#define CONVHULL_3D_USE_SINGLE_PRECISION /* (optional) */
 #define CONVHULL_3D_ENABLE
 #include "convhull_3d.h"
 ```
@@ -88,10 +90,6 @@ The 'test/test_convhull_3d.c' file may also serve as example usage of the convhu
 Convex Hulls of uniformly distributed points on a sphere (180, 840, 5100 points left-to-right):
 
 ![](images/sph_tdesigns.png)
-
-## Future work
-
-Possibly add the Delaunay triangulation and Voronoi diagram algorithms, as the additional effort to implement them is relatively low.
 
 ## License
 

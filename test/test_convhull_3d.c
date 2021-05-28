@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2018 Leo McCormack
+ Copyright (c) 2017-2021 Leo McCormack
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,14 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+/* Use the new convhull_nd_build() function (configured for 3d) instead of the original convhull_3d_build() */
+#define TEST_CONVHULL_ND_INSTEAD
+
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
 #define CONVHULL_3D_ENABLE
-//#define CONVHULL_3D_USE_FLOAT_PRECISION /* optional */
+//#define CONVHULL_3D_USE_SINGLE_PRECISION /* optional */
 //#define CONVHULL_3D_USE_CBLAS /* optional */
 #include "convhull_3d.h"
 #include "uniform_sph.h"
@@ -112,7 +115,18 @@ int main(int argc, const char * argv[])
         vertices[i].y = sin(azi) * cos(elev) * rand()/(float)RAND_MAX;
     }
     printf("TEST: building convexhull of a random spherical distribution");
+#ifdef TEST_CONVHULL_ND_INSTEAD
+    CH_FLOAT* points;
+    points = malloc(n*3*sizeof(CH_FLOAT));
+    for (i = 0; i < n; i++) {
+        points[i*3+0] = vertices[i].x;
+        points[i*3+1] = vertices[i].y;
+        points[i*3+2] = vertices[i].z;
+    }
+    convhull_nd_build(points, n, 3, &out_faces, NULL, NULL , &nFaces);
+#else
     convhull_3d_build(vertices, n, &out_faces, &nFaces); /* build hull */
+#endif
     if(out_faces==NULL){
         printf("... FAILED!\n");
         nFAIL++;
@@ -129,7 +143,7 @@ int main(int argc, const char * argv[])
         nSUCCEEDED++;
     }
     free(vertices);
-    
+
     /******************************************************
      * TEST: uniform distribution of 180 points on a sphere
      *****************************************************/
@@ -141,7 +155,17 @@ int main(int argc, const char * argv[])
         vertices[i].y = cos(__Tdesign_degree_18_dirs_deg[i][1]*M_PI/180.0f)*sin(__Tdesign_degree_18_dirs_deg[i][0]*M_PI/180.0f);
     }
     printf("TEST: building convexhull of a 180 point t-design");
+#ifdef TEST_CONVHULL_ND_INSTEAD
+    points = realloc(points, n*3*sizeof(CH_FLOAT));
+    for (i = 0; i < n; i++) {
+        points[i*3+0] = vertices[i].x;
+        points[i*3+1] = vertices[i].y;
+        points[i*3+2] = vertices[i].z;
+    }
+    convhull_nd_build(points, n, 3, &out_faces, NULL, NULL , &nFaces);
+#else
     convhull_3d_build(vertices, n, &out_faces, &nFaces); /* build hull */
+#endif
     if(out_faces==NULL){
         printf("... FAILED!\n");
         nFAIL++;
@@ -170,7 +194,17 @@ int main(int argc, const char * argv[])
         vertices[i].y = cos(__Tdesign_degree_40_dirs_deg[i][1]*M_PI/180.0f)*sin(__Tdesign_degree_40_dirs_deg[i][0]*M_PI/180.0f);
     }
     printf("TEST: building convexhull of a 840 point t-design");
+#ifdef TEST_CONVHULL_ND_INSTEAD
+    points = realloc(points, n*3*sizeof(CH_FLOAT));
+    for (i = 0; i < n; i++) {
+        points[i*3+0] = vertices[i].x;
+        points[i*3+1] = vertices[i].y;
+        points[i*3+2] = vertices[i].z;
+    }
+    convhull_nd_build(points, n, 3, &out_faces, NULL, NULL , &nFaces);
+#else
     convhull_3d_build(vertices, n, &out_faces, &nFaces); /* build hull */
+#endif
     if(out_faces==NULL){
         printf("... FAILED!\n");
         nFAIL++;
@@ -199,7 +233,17 @@ int main(int argc, const char * argv[])
         vertices[i].y = cos(__Tdesign_degree_100_dirs_deg[i][1]*M_PI/180.0f)*sin(__Tdesign_degree_100_dirs_deg[i][0]*M_PI/180.0f);
     }
     printf("TEST: building convexhull of a 5100 point t-design");
+#ifdef TEST_CONVHULL_ND_INSTEAD
+    points = realloc(points, n*3*sizeof(CH_FLOAT));
+    for (i = 0; i < n; i++) {
+        points[i*3+0] = vertices[i].x;
+        points[i*3+1] = vertices[i].y;
+        points[i*3+2] = vertices[i].z;
+    }
+    convhull_nd_build(points, n, 3, &out_faces, NULL, NULL , &nFaces);
+#else
     convhull_3d_build(vertices, n, &out_faces, &nFaces); /* build hull */
+#endif
     if(out_faces==NULL){
         printf("... FAILED!\n");
         nFAIL++;
@@ -228,7 +272,17 @@ int main(int argc, const char * argv[])
         extractVerticesFromObjFile(path, &vertices, &nVert);
         printf("TEST: building convexhull of ");
         printf(path);
+#ifdef TEST_CONVHULL_ND_INSTEAD
+        points = realloc(points, nVert*3*sizeof(CH_FLOAT));
+        for (i = 0; i < nVert; i++) {
+            points[i*3+0] = vertices[i].x;
+            points[i*3+1] = vertices[i].y;
+            points[i*3+2] = vertices[i].z;
+        }
+        convhull_nd_build(points, nVert, 3, &out_faces, NULL, NULL , &nFaces);
+#else
         convhull_3d_build(vertices, nVert, &out_faces, &nFaces); /* build hull */
+#endif
         if(out_faces==NULL){
             printf("... FAILED!\n");
             nFAIL++;
@@ -256,6 +310,11 @@ int main(int argc, const char * argv[])
     sprintf(tmp_str, "%d", nSUCCEEDED+nFAIL);
     printf(tmp_str);
     printf("\n");
+
+    /* clean-up */
+#ifdef TEST_CONVHULL_ND_INSTEAD
+    free(points);
+#endif
     
     return 0;
 }
