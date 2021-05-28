@@ -120,11 +120,11 @@ void convhull_nd_build(/* input arguments */
 
 /* Computes the Delaunay triangulation (mesh) of an arrangement of points in N-dimensional space */
 void delaunay_nd_mesh(/* input Arguments */
-                      const float* points,                      /* The input points; FLAT: nDirs x nd */
+                      const float* points,                      /* The input points; FLAT: nPoints x nd */
                       const int nPoints,                        /* Number of points */
                       const int nd,                             /* The number of dimensions */
                       /* output Arguments */
-                      int** Mesh,                               /* (&) the indices defining the Delaunay triangulation of the points; FLAT: nDT x (nd+1) */
+                      int** Mesh,                               /* (&) the indices defining the Delaunay triangulation of the points; FLAT: nMesh x (nd+1) */
                       int* nMesh);                              /* (&) Number of triangulations */
 
 
