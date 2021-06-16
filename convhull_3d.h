@@ -1669,7 +1669,7 @@ void delaunay_nd_mesh
     CH_FLOAT* projpoints, *cf, *df, *p0, *p, *visible;
 
     /* Project the N-dimensional points onto a N+1-dimensional paraboloid */
-    projpoints = ch_malloc(nPoints*(nd+1)*sizeof(CH_FLOAT));
+    projpoints = (CH_FLOAT*)ch_malloc(nPoints*(nd+1)*sizeof(CH_FLOAT));
     for(i = 0; i < nPoints; i++) {
         projpoints[i*(nd+1)+nd] = 0.0;
         for(j=0; j<nd; j++){
@@ -1702,7 +1702,7 @@ void delaunay_nd_mesh
     assert(maxW_idx!=-1);
 #endif
     w0 = projpoints[maxW_idx*(nd+1)+nd];
-    p0 = ch_malloc(nd*sizeof(CH_FLOAT));
+    p0 = (CH_FLOAT*)ch_malloc(nd*sizeof(CH_FLOAT));
     for(j=0; j<nd; j++)
         p0[j] = projpoints[maxW_idx*(nd+1)+j];
 
@@ -1718,11 +1718,11 @@ void delaunay_nd_mesh
     w_optimal2=w_optimal-1000.0*fabs(w_optimal);
 
     /* Set the point where the tangent plane crosses the w axis */
-    p = ch_calloc((nd+1),sizeof(CH_FLOAT));
+    p = (CH_FLOAT*)ch_calloc((nd+1),sizeof(CH_FLOAT));
     p[nd] = w_optimal2;
 
     /* Find all faces that are visible from this point */
-    visible = ch_malloc(nHullFaces*sizeof(CH_FLOAT));
+    visible = (CH_FLOAT*)ch_malloc(nHullFaces*sizeof(CH_FLOAT));
 #ifdef CONVHULL_3D_USE_CBLAS
     if(sizeof(CH_FLOAT)==sizeof(double)){
         cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, nHullFaces, 1, nd+1, 1.0,
@@ -1753,7 +1753,7 @@ void delaunay_nd_mesh
     /* Output */
     (*nMesh) = nVisible;
     if(nVisible>0){
-        (*Mesh) = ch_malloc(nVisible*(nd+1)*sizeof(int));
+        (*Mesh) = (int*)ch_malloc(nVisible*(nd+1)*sizeof(int));
         for(i=0, j=0; i<nHullFaces; i++){
             if(visible[i]>0.0){
                 for(k=0; k<nd+1; k++)
