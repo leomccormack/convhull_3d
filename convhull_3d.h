@@ -501,6 +501,28 @@ static void ismember
                 pOut[i] = 1;
 }
 
+static CH_FLOAT rnd(int x, int y)
+{
+    // Reference(s):
+    //
+    // - Improvements to the canonical one-liner GLSL rand() for OpenGL ES 2.0
+    //   http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
+    //
+    CH_FLOAT a  = 12.9898;
+    CH_FLOAT b  = 78.233;
+    CH_FLOAT c  = 43758.5453;
+    CH_FLOAT dt = x*a + y*b;
+#ifdef CONVHULL_3D_USE_SINGLE_PRECISION
+    float sn = fmodf(dt, 3.14);
+    float intpart;
+    return modff(sin(sn) * c, &intpart);
+#else
+    double sn = fmod(dt, 3.14);
+    double intpart;
+    return modf(sin(sn) * c, &intpart);
+#endif // CONVHULL_3D_USE_SINGLE_PRECISION
+}
+
 /* A C version of the 3D quickhull matlab implementation from here:
  * https://www.mathworks.com/matlabcentral/fileexchange/48509-computational-geometry-toolbox?focused=3851550&tab=example
  * (*out_faces) is returned as NULL, if triangulation fails *
@@ -537,7 +559,7 @@ void convhull_3d_build
     points = (CH_FLOAT*)malloc(nVert*(d+1)*sizeof(CH_FLOAT));
     for(i=0; i<nVert; i++){
         for(j=0; j<d; j++)
-            points[i*(d+1)+j] = in_vertices[i].v[j] + CH_NOISE_VAL*rand()/(CH_FLOAT)RAND_MAX; /* noise mitigates duplicates */
+            points[i*(d+1)+j] = in_vertices[i].v[j] + CH_NOISE_VAL*rnd(i, j); /* noise mitigates duplicates */
         points[i*(d+1)+d] = 1.0f; /* add a last column of ones. Used only for determinant calculation */
     }
 
@@ -1198,7 +1220,7 @@ void convhull_nd_build
     points = (CH_FLOAT*)ch_malloc(nVert*(d+1)*sizeof(CH_FLOAT));
     for(i=0; i<nVert; i++){
         for(j=0; j<d; j++)
-            points[i*(d+1)+j] = in_vertices[i*d+j] + CH_NOISE_VAL*(CH_FLOAT)rand()/(CH_FLOAT)RAND_MAX;
+            points[i*(d+1)+j] = in_vertices[i*d+j] + CH_NOISE_VAL*rnd(i, j);
         points[i*(d+1)+d] = 1.0; /* add a last column of ones. Used only for determinant calculation */
     }
 
@@ -1673,7 +1695,7 @@ void delaunay_nd_mesh
     for(i = 0; i < nPoints; i++) {
         projpoints[i*(nd+1)+nd] = 0.0;
         for(j=0; j<nd; j++){
-            projpoints[i*(nd+1)+j] = (CH_FLOAT)points[i*nd+j] + 0.0000001*(CH_FLOAT)rand()/(CH_FLOAT)RAND_MAX;
+            projpoints[i*(nd+1)+j] = (CH_FLOAT)points[i*nd+j] + 0.0000001*rnd(i, j);
             projpoints[i*(nd+1)+nd] += (projpoints[i*(nd+1)+j]*projpoints[i*(nd+1)+j]); /* w vector */
         }
     }
