@@ -269,7 +269,7 @@ int main(int argc, const char * argv[])
         path[0] = '\0';
         strcat(path, obj_folder);
         strcat(path, obj_test_files[o]);
-        extractVerticesFromObjFile(path, &vertices, &nVert);
+        extract_vertices_from_obj_file(path, &vertices, &nVert);
         printf("TEST: building convexhull of ");
         printf(path);
 #ifdef TEST_CONVHULL_ND_INSTEAD
