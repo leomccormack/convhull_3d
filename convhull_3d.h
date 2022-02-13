@@ -556,7 +556,7 @@ void convhull_3d_build
     d = 3;
 
     /* Add noise to the points */
-    points = (CH_FLOAT*)malloc(nVert*(d+1)*sizeof(CH_FLOAT));
+    points = (CH_FLOAT*)ch_malloc(nVert*(d+1)*sizeof(CH_FLOAT));
     for(i=0; i<nVert; i++){
         for(j=0; j<d; j++)
             points[i*(d+1)+j] = in_vertices[i].v[j] + CH_NOISE_VAL*rnd(i, j); /* noise mitigates duplicates */
@@ -564,7 +564,7 @@ void convhull_3d_build
     }
 
     /* Find the span */
-    span = (CH_FLOAT*)malloc(d*sizeof(CH_FLOAT));
+    span = (CH_FLOAT*)ch_malloc(d*sizeof(CH_FLOAT));
     for(j=0; j<d; j++){
         max_p = -2.23e+13; min_p = 2.23e+13;
         for(i=0; i<nVert; i++){
