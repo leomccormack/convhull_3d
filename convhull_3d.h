@@ -99,11 +99,11 @@ void convhull_3d_export_m(/* input arguments */
                           char* const m_filename);              /* m filename, WITHOUT extension */
     
 /* reads an 'obj' file and extracts only the vertices (for 3d convexhulls only) */
-void extractVerticesFromObjFile(/* input arguments */
-                                char* const obj_filename,       /* obj filename, WITHOUT extension */
-                                /* output arguments */
-                                ch_vertex** out_vertices,       /* & of empty ch_vertex*, output vertices; out_nVert x 1 */
-                                int* out_nVert);                /* & of int, number of vertices */
+void extract_vertices_from_obj_file(/* input arguments */
+                                    char* const obj_filename,       /* obj filename, WITHOUT extension */
+                                    /* output arguments */
+                                    ch_vertex** out_vertices,       /* & of empty ch_vertex*, output vertices; out_nVert x 1 */
+                                    int* out_nVert);                /* & of int, number of vertices */
 
 /**** NEW! ****/
 
@@ -1117,7 +1117,11 @@ void convhull_3d_export_m
     fclose(m_file);
 }
 
-void extractVerticesFromObjFile(char* const obj_filename, ch_vertex** out_vertices, int* out_nVert)
+void extract_vertices_from_obj_file
+(
+    char* const obj_filename,
+    ch_vertex** out_vertices,
+    int* out_nVert)
 {
     FILE* obj_file;
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
