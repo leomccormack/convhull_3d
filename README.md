@@ -20,7 +20,7 @@ Then specify the vertices, which can be optionally extracted from an '.obj' file
 ```c
 ch_vertex* vertices = NULL;
 int nVertices;
-extractVerticesFromObjFile(OBJ_FILE_NAME, &vertices, &nVertices);
+extract_vertices_from_obj_file(OBJ_FILE_NAME, &vertices, &nVertices);
 /* Where 'vertices' is a vector of vertices [nVertices].x, .y, .z  */
 ```
 
