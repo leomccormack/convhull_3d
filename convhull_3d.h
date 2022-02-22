@@ -885,8 +885,8 @@ void convhull_3d_build
             }
             
             /* Orient each new face properly */
-            hVec = (int*)ch_malloc( nFaces*sizeof(int));
-            hVec_mem_face = (int*)ch_malloc( nFaces*sizeof(int));
+            hVec = (int*)ch_malloc(nFaces*sizeof(int));
+            hVec_mem_face = (int*)ch_malloc(nFaces*sizeof(int));
             for(j=0; j<nFaces; j++)
                 hVec[j] = j;
             for(k=start; k<nFaces; k++){
@@ -1552,8 +1552,8 @@ void convhull_nd_build
             }
 
             /* Orient each new face properly */
-            hVec = (int*)ch_malloc( nFaces*sizeof(int));
-            hVec_mem_face = (int*)ch_malloc( nFaces*sizeof(int));
+            hVec = (int*)ch_malloc(nFaces*sizeof(int));
+            hVec_mem_face = (int*)ch_malloc(nFaces*sizeof(int));
             for(j=0; j<nFaces; j++)
                 hVec[j] = j;
             for(k=start; k<nFaces; k++){
