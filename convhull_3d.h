@@ -1210,7 +1210,7 @@ void convhull_nd_build
     assert(d<=CONVHULL_ND_MAX_DIMENSIONS);
 
     /* Solution not possible... */
-    if(nVert<=d || in_vertices==NULL){
+    if(d>CONVHULL_ND_MAX_DIMENSIONS || nVert<=d || in_vertices==NULL){
         (*out_faces) = NULL;
         (*nOut_faces) = 0;
         if(out_cf!=NULL)
@@ -1709,6 +1709,14 @@ void delaunay_nd_mesh
     cf = df = NULL;
     convhull_nd_build(projpoints, nPoints, nd+1, &hullfaces, &cf, &df, &nHullFaces);
 
+    /* Solution not possible... */
+    if(nd>CONVHULL_ND_MAX_DIMENSIONS || !hullfaces || !nHullFaces){
+        (*Mesh) = NULL;
+        (*nMesh) = 0;
+        ch_free(projpoints);
+        return;
+    }
+    
     /* Find the coordinates of the point with the maximum (N+1 dimension) coordinate (i.e. the w vector) */
 #ifdef CONVHULL_3D_USE_CBLAS
     if(sizeof(CH_FLOAT)==sizeof(double))
