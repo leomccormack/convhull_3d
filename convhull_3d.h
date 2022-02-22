@@ -476,7 +476,7 @@ static void plane_nd
     norm_c = (CH_FLOAT)0.0;
     for(i=0; i<Nd; i++)
         norm_c += (pow(c[i], 2.0));
-    norm_c = sqrt(norm_c);
+    norm_c = ch_sqrt(norm_c);
     for(i=0; i<Nd; i++)
         c[i] /= norm_c;
     (*d) = (CH_FLOAT)0.0;
@@ -1346,7 +1346,7 @@ void convhull_nd_build
     desReldist = (CH_FLOAT*)ch_malloc((nVert-d-1) * sizeof(CH_FLOAT));
     for(i=0; i<(nVert-d-1); i++)
         for(j=0; j<d; j++)
-            reldist[i] += pow(absdist[i*d+j], 2.0);
+            reldist[i] += ch_pow(absdist[i*d+j], 2.0);
 
     /* Sort from maximum to minimum relative distance */
     int num_pleft, cnt;
