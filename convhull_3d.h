@@ -245,6 +245,7 @@ void extract_vertices_from_obj_file_alloc(/* input arguments */
 #endif
 
 #define CH_MAX_NUM_FACES 50000
+#define CONVHULL_3D_MAX_DIMENSIONS 3
 #define CONVHULL_ND_MAX_DIMENSIONS 5
 
 /* structs for qsort */
@@ -583,7 +584,10 @@ void convhull_3d_build_alloc
     int nFaces, p, d;
     int* aVec, *faces;
     CH_FLOAT dfi, v, max_p, min_p;
-    CH_FLOAT* points, *cf, *cfi, *df, *p_s, *span;
+    CH_FLOAT span[CONVHULL_3D_MAX_DIMENSIONS];
+    CH_FLOAT cfi[CONVHULL_3D_MAX_DIMENSIONS];
+    CH_FLOAT p_s[CONVHULL_3D_MAX_DIMENSIONS*CONVHULL_3D_MAX_DIMENSIONS];
+    CH_FLOAT* points, *cf, *df;
     
     if(nVert<3 || in_vertices==NULL){
         (*out_faces) = NULL;
@@ -604,7 +608,6 @@ void convhull_3d_build_alloc
     }
 
     /* Find the span */
-    span = (CH_FLOAT*)ch_stateful_malloc(allocator, d*sizeof(CH_FLOAT));
     for(j=0; j<d; j++){
         max_p = -2.23e+13; min_p = 2.23e+13;
         for(i=0; i<nVert; i++){
@@ -626,9 +629,7 @@ void convhull_3d_build_alloc
     
     /* Each column of cf contains the coefficients of a plane */
     cf = (CH_FLOAT*)ch_stateful_malloc(allocator, nFaces*d*sizeof(CH_FLOAT));
-    cfi = (CH_FLOAT*)ch_stateful_malloc(allocator, d*sizeof(CH_FLOAT));
     df = (CH_FLOAT*)ch_stateful_malloc(allocator, nFaces*sizeof(CH_FLOAT));
-    p_s = (CH_FLOAT*)ch_stateful_malloc(allocator, d*d*sizeof(CH_FLOAT));
     for(i=0; i<nFaces; i++){
         /* Set the indices of the points defining the face  */
         for(j=0, k=0; j<(d+1); j++){
@@ -649,19 +650,17 @@ void convhull_3d_build_alloc
             cf[i*d+j] = cfi[j];
         df[i] = dfi;
     }
-    CH_FLOAT *A;
-    int *bVec, *fVec, *asfVec;
+    CH_FLOAT A[(CONVHULL_3D_MAX_DIMENSIONS + 1)*(CONVHULL_3D_MAX_DIMENSIONS + 1)];
+    int fVec[CONVHULL_3D_MAX_DIMENSIONS+1];
     int face_tmp[2];
     
     /* Check to make sure that faces are correctly oriented */
-    bVec = (int*)ch_stateful_malloc(allocator, 4*sizeof(int));
+    int bVec[CONVHULL_3D_MAX_DIMENSIONS+1];
     for(i=0; i<d+1; i++)
         bVec[i] = i;
     
     /* A contains the coordinates of the points forming a simplex */
-    A = (CH_FLOAT*)ch_stateful_calloc(allocator, (d+1)*(d+1), sizeof(CH_FLOAT));
-    fVec = (int*)ch_stateful_malloc(allocator, (d+1)*sizeof(int));
-    asfVec = (int*)ch_stateful_malloc(allocator, (d+1)*sizeof(int));
+    memset(A, 0, sizeof(A));
     for(k=0; k<(d+1); k++){
         /* Get the point that is not on the current face (point p) */
         for(i=0; i<d; i++)
@@ -700,8 +699,9 @@ void convhull_3d_build_alloc
     }
     
     /* Coordinates of the center of the point set */
-    CH_FLOAT* meanp, *absdist, *reldist, *desReldist;
-    meanp = (CH_FLOAT*)ch_stateful_calloc(allocator, d, sizeof(CH_FLOAT));
+    CH_FLOAT meanp[CONVHULL_3D_MAX_DIMENSIONS];
+    CH_FLOAT* absdist, *reldist, *desReldist;
+    memset(meanp, 0, sizeof(meanp));
     for(i=d+1; i<nVert; i++)
         for(j=0; j<d; j++)
             meanp[j] += points[i*(d+1)+j];
@@ -736,16 +736,19 @@ void convhull_3d_build_alloc
     
     /* Loop over all remaining points that are not deleted. Deletion of points
      occurs every #iter2del# iterations of this while loop */
-    memset(A, 0, (d+1)*(d+1) * sizeof(CH_FLOAT));
-    
+    memset(A, 0, sizeof(A));
+
     /* cnt is equal to the points having been selected without deletion of
      nonvisible points (i.e. points inside the current convex hull) */
     cnt=0;
     
     /* The main loop for the quickhull algorithm */
     CH_FLOAT detA;
-    CH_FLOAT* points_cf, *points_s;
-    int* visible_ind, *visible, *nonvisible_faces, *f0, *face_s, *u, *gVec, *horizon, *hVec, *pp, *hVec_mem_face;
+    CH_FLOAT* points_cf;
+    CH_FLOAT points_s[CONVHULL_3D_MAX_DIMENSIONS];
+    int face_s[CONVHULL_3D_MAX_DIMENSIONS];
+    int gVec[CONVHULL_3D_MAX_DIMENSIONS];
+    int* visible_ind, *visible, *nonvisible_faces, *f0, *u, *horizon, *hVec, *pp, *hVec_mem_face;
     int num_visible_ind, num_nonvisible_faces, n_newfaces, count, vis;
     int f0_sum, u_len, start, num_p, index, horizon_size1;
     int FUCKED;
@@ -755,9 +758,6 @@ void convhull_3d_build_alloc
     nFaces = d+1;
     visible_ind = (int*)ch_stateful_malloc(allocator, nFaces*sizeof(int));
     points_cf = (CH_FLOAT*)ch_stateful_malloc(allocator, nFaces*sizeof(CH_FLOAT));
-    points_s = (CH_FLOAT*)ch_stateful_malloc(allocator, d*sizeof(CH_FLOAT));
-    face_s = (int*)ch_stateful_malloc(allocator, d*sizeof(int));
-    gVec = (int*)ch_stateful_malloc(allocator, d*sizeof(int));
     while( (num_pleft>0) ){
         /* i is the first point of the points left */
         i = pleft[0];
@@ -1013,26 +1013,15 @@ void convhull_3d_build_alloc
     ch_stateful_free(allocator, hVec_mem_face);
     ch_stateful_free(allocator, visible_ind);
     ch_stateful_free(allocator, points_cf);
-    ch_stateful_free(allocator, points_s);
-    ch_stateful_free(allocator, face_s);
-    ch_stateful_free(allocator, gVec);
-    ch_stateful_free(allocator, meanp);
     ch_stateful_free(allocator, absdist);
     ch_stateful_free(allocator, reldist);
     ch_stateful_free(allocator, desReldist);
     ch_stateful_free(allocator, ind);
-    ch_stateful_free(allocator, span);
     ch_stateful_free(allocator, points);
     ch_stateful_free(allocator, faces);
     ch_stateful_free(allocator, aVec);
     ch_stateful_free(allocator, cf);
-    ch_stateful_free(allocator, cfi);
     ch_stateful_free(allocator, df);
-    ch_stateful_free(allocator, p_s);
-    ch_stateful_free(allocator, fVec);
-    ch_stateful_free(allocator, asfVec);
-    ch_stateful_free(allocator, bVec);
-    ch_stateful_free(allocator, A);
 }
 
 void convhull_3d_export_obj
@@ -1270,7 +1259,10 @@ void convhull_nd_build_alloc
     int nFaces, p;
     int* aVec, *faces;
     CH_FLOAT dfi, v, max_p, min_p;
-    CH_FLOAT* points, *cf, *cfi, *df, *p_s, *span;
+    CH_FLOAT span[CONVHULL_ND_MAX_DIMENSIONS];
+    CH_FLOAT cfi[CONVHULL_ND_MAX_DIMENSIONS];
+    CH_FLOAT p_s[CONVHULL_ND_MAX_DIMENSIONS*CONVHULL_ND_MAX_DIMENSIONS];
+    CH_FLOAT* points, *cf, *df;
 
     assert(d<=CONVHULL_ND_MAX_DIMENSIONS);
 
@@ -1294,7 +1286,6 @@ void convhull_nd_build_alloc
     }
 
     /* Find the span */
-    span = (CH_FLOAT*)ch_stateful_malloc(allocator, d*sizeof(CH_FLOAT));
     for(j=0; j<d; j++){
         max_p = -2.23e+13; min_p = 2.23e+13;
         for(i=0; i<nVert; i++){
@@ -1316,9 +1307,7 @@ void convhull_nd_build_alloc
 
     /* Each column of cf contains the coefficients of a plane */
     cf = (CH_FLOAT*)ch_stateful_malloc(allocator, nFaces*d*sizeof(CH_FLOAT));
-    cfi = (CH_FLOAT*)ch_stateful_malloc(allocator, d*sizeof(CH_FLOAT));
     df = (CH_FLOAT*)ch_stateful_malloc(allocator, nFaces*sizeof(CH_FLOAT));
-    p_s = (CH_FLOAT*)ch_stateful_malloc(allocator, d*d*sizeof(CH_FLOAT));
     for(i=0; i<nFaces; i++){
         /* Set the indices of the points defining the face  */
         for(j=0, k=0; j<(d+1); j++){
@@ -1339,18 +1328,17 @@ void convhull_nd_build_alloc
             cf[i*d+j] = cfi[j];
         df[i] = dfi;
     }
-    CH_FLOAT *A;
-    int *bVec, *fVec;
+    CH_FLOAT A[(CONVHULL_ND_MAX_DIMENSIONS+1)*(CONVHULL_ND_MAX_DIMENSIONS+1)];
+    int fVec[CONVHULL_ND_MAX_DIMENSIONS+1];
     int face_tmp[2];
 
     /* Check to make sure that faces are correctly oriented */
-    bVec = (int*)ch_stateful_malloc(allocator, (d+1)*sizeof(int));
+    int bVec[CONVHULL_ND_MAX_DIMENSIONS+1];
     for(i=0; i<d+1; i++)
         bVec[i] = i;
 
     /* A contains the coordinates of the points forming a simplex */
-    A = (CH_FLOAT*)ch_stateful_calloc(allocator, (d+1)*(d+1), sizeof(CH_FLOAT));
-    fVec = (int*)ch_stateful_malloc(allocator, (d+1)*sizeof(int));
+    memset(A, 0, sizeof(A));
     for(k=0; k<(d+1); k++){
         /* Get the point that is not on the current face (point p) */
         for(i=0; i<d; i++)
@@ -1392,8 +1380,9 @@ void convhull_nd_build_alloc
     }
 
     /* Coordinates of the center of the point set */
-    CH_FLOAT* meanp, *reldist, *desReldist, *absdist;
-    meanp = (CH_FLOAT*)ch_stateful_calloc(allocator, d, sizeof(CH_FLOAT));
+    CH_FLOAT meanp[CONVHULL_ND_MAX_DIMENSIONS];
+    CH_FLOAT* reldist, *desReldist, *absdist;
+    memset(meanp, 0, sizeof(meanp));
     for(i=d+1; i<nVert; i++)
         for(j=0; j<d; j++)
             meanp[j] += points[i*(d+1)+j];
@@ -1428,7 +1417,7 @@ void convhull_nd_build_alloc
 
     /* Loop over all remaining points that are not deleted. Deletion of points
      occurs every #iter2del# iterations of this while loop */
-    memset(A, 0, (d+1)*(d+1) * sizeof(CH_FLOAT));
+    memset(A, 0, sizeof(A));
 
     /* cnt is equal to the points having been selected without deletion of
      nonvisible points (i.e. points inside the current convex hull) */
@@ -1436,8 +1425,11 @@ void convhull_nd_build_alloc
 
     /* The main loop for the quickhull algorithm */
     CH_FLOAT detA;
-    CH_FLOAT* points_cf, *points_s;
-    int* visible_ind, *visible, *nonvisible_faces, *f0, *face_s, *u, *gVec, *horizon, *hVec, *pp, *hVec_mem_face;
+    CH_FLOAT* points_cf;
+    CH_FLOAT points_s[CONVHULL_ND_MAX_DIMENSIONS];
+    int face_s[CONVHULL_ND_MAX_DIMENSIONS];
+    int gVec[CONVHULL_ND_MAX_DIMENSIONS];
+    int* visible_ind, *visible, *nonvisible_faces, *f0, *u, *horizon, *hVec, *pp, *hVec_mem_face;
     int num_visible_ind, num_nonvisible_faces, n_newfaces, count, vis;
     int f0_sum, u_len, start, num_p, index, horizon_size1;
     int FUCKED;
@@ -1447,9 +1439,6 @@ void convhull_nd_build_alloc
     nFaces = d+1;
     visible_ind = (int*)ch_stateful_malloc(allocator, nFaces*sizeof(int));
     points_cf = (CH_FLOAT*)ch_stateful_malloc(allocator, nFaces*sizeof(CH_FLOAT));
-    points_s = (CH_FLOAT*)ch_stateful_malloc(allocator, d*sizeof(CH_FLOAT));
-    face_s = (int*)ch_stateful_malloc(allocator, d*sizeof(int));
-    gVec = (int*)ch_stateful_malloc(allocator, d*sizeof(int));
     while( (num_pleft>0) ){
         /* i is the first point of the points left */
         i = pleft[0];
@@ -1723,25 +1712,15 @@ void convhull_nd_build_alloc
     ch_stateful_free(allocator, hVec_mem_face);
     ch_stateful_free(allocator, visible_ind);
     ch_stateful_free(allocator, points_cf);
-    ch_stateful_free(allocator, points_s);
-    ch_stateful_free(allocator, face_s);
-    ch_stateful_free(allocator, gVec);
-    ch_stateful_free(allocator, meanp);
     ch_stateful_free(allocator, absdist);
     ch_stateful_free(allocator, reldist);
     ch_stateful_free(allocator, desReldist);
     ch_stateful_free(allocator, ind);
-    ch_stateful_free(allocator, span);
     ch_stateful_free(allocator, points);
     ch_stateful_free(allocator, faces);
     ch_stateful_free(allocator, aVec);
     ch_stateful_free(allocator, cf);
-    ch_stateful_free(allocator, cfi);
     ch_stateful_free(allocator, df);
-    ch_stateful_free(allocator, p_s);
-    ch_stateful_free(allocator, fVec);
-    ch_stateful_free(allocator, bVec);
-    ch_stateful_free(allocator, A);
 }
 
 void delaunay_nd_mesh
