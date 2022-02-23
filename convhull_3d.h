@@ -749,7 +749,7 @@ void convhull_3d_build_alloc
     int face_s[CONVHULL_3D_MAX_DIMENSIONS];
     int gVec[CONVHULL_3D_MAX_DIMENSIONS];
     int* visible_ind, *visible, *nonvisible_faces, *f0, *u, *horizon, *hVec, *pp, *hVec_mem_face;
-    int num_visible_ind, num_nonvisible_faces, n_newfaces, count, vis;
+    int num_visible_ind, num_nonvisible_faces, n_newfaces, n_realloc_faces, count, vis;
     int f0_sum, u_len, start, num_p, index, horizon_size1;
     int FUCKED;
     FUCKED = 0;
@@ -890,20 +890,21 @@ void convhull_3d_build_alloc
             
             /* Update the number of faces */
             nFaces = nFaces-num_visible_ind;
-            faces = (int*)ch_stateful_realloc(allocator, faces, nFaces*d*sizeof(int));
-            cf = (CH_FLOAT*)ch_stateful_realloc(allocator, cf, nFaces*d*sizeof(CH_FLOAT));
-            df = (CH_FLOAT*)ch_stateful_realloc(allocator, df, nFaces*sizeof(CH_FLOAT));
             
             /* start is the first row of the new faces */
             start=nFaces;
             
             /* Add faces connecting horizon to the new point */
             n_newfaces = horizon_size1;
+            n_realloc_faces = nFaces + n_newfaces;
+            if (n_realloc_faces > CH_MAX_NUM_FACES)
+                n_realloc_faces = CH_MAX_NUM_FACES+1;
+            faces = (int*)ch_stateful_realloc(allocator, faces, n_realloc_faces*d*sizeof(int));
+            cf = (CH_FLOAT*)ch_stateful_realloc(allocator, cf, n_realloc_faces*d*sizeof(CH_FLOAT));
+            df = (CH_FLOAT*)ch_stateful_realloc(allocator, df, n_realloc_faces*sizeof(CH_FLOAT));
+        
             for(j=0; j<n_newfaces; j++){
                 nFaces++;
-                faces = (int*)ch_stateful_realloc(allocator, faces, nFaces*d*sizeof(int));
-                cf = (CH_FLOAT*)ch_stateful_realloc(allocator, cf, nFaces*d*sizeof(CH_FLOAT));
-                df = (CH_FLOAT*)ch_stateful_realloc(allocator, df, nFaces*sizeof(CH_FLOAT));
                 for(k=0; k<d-1; k++)
                     faces[(nFaces-1)*d+k] = horizon[j*(d-1)+k];
                 faces[(nFaces-1)*d+(d-1)] = i;
@@ -1430,7 +1431,7 @@ void convhull_nd_build_alloc
     int face_s[CONVHULL_ND_MAX_DIMENSIONS];
     int gVec[CONVHULL_ND_MAX_DIMENSIONS];
     int* visible_ind, *visible, *nonvisible_faces, *f0, *u, *horizon, *hVec, *pp, *hVec_mem_face;
-    int num_visible_ind, num_nonvisible_faces, n_newfaces, count, vis;
+    int num_visible_ind, num_nonvisible_faces, n_newfaces, n_realloc_faces, count, vis;
     int f0_sum, u_len, start, num_p, index, horizon_size1;
     int FUCKED;
     FUCKED = 0;
@@ -1571,20 +1572,21 @@ void convhull_nd_build_alloc
 
             /* Update the number of faces */
             nFaces = nFaces-num_visible_ind;
-            faces = (int*)ch_stateful_realloc(allocator, faces, nFaces*d*sizeof(int));
-            cf = (CH_FLOAT*)ch_stateful_realloc(allocator, cf, nFaces*d*sizeof(CH_FLOAT));
-            df = (CH_FLOAT*)ch_stateful_realloc(allocator, df, nFaces*sizeof(CH_FLOAT));
 
             /* start is the first row of the new faces */
             start=nFaces;
 
             /* Add faces connecting horizon to the new point */
             n_newfaces = horizon_size1;
+            n_realloc_faces = nFaces + n_newfaces;
+            if (n_realloc_faces > CH_MAX_NUM_FACES)
+                n_realloc_faces = CH_MAX_NUM_FACES+1;
+            faces = (int*)ch_stateful_realloc(allocator, faces, (nFaces+n_newfaces)*d*sizeof(int));
+            cf = (CH_FLOAT*)ch_stateful_realloc(allocator, cf, (nFaces+n_newfaces)*d*sizeof(CH_FLOAT));
+            df = (CH_FLOAT*)ch_stateful_realloc(allocator, df, (nFaces+n_newfaces)*sizeof(CH_FLOAT));
+
             for(j=0; j<n_newfaces; j++){
                 nFaces++;
-                faces = (int*)ch_stateful_realloc(allocator, faces, nFaces*d*sizeof(int));
-                cf = (CH_FLOAT*)ch_stateful_realloc(allocator, cf, nFaces*d*sizeof(CH_FLOAT));
-                df = (CH_FLOAT*)ch_stateful_realloc(allocator, df, nFaces*sizeof(CH_FLOAT));
                 for(k=0; k<d-1; k++)
                     faces[(nFaces-1)*d+k] = horizon[j*(d-1)+k];
                 faces[(nFaces-1)*d+(d-1)] = i;
