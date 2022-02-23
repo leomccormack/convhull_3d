@@ -650,7 +650,7 @@ void convhull_3d_build_alloc
             cf[i*d+j] = cfi[j];
         df[i] = dfi;
     }
-    CH_FLOAT A[(CONVHULL_3D_MAX_DIMENSIONS + 1)*(CONVHULL_3D_MAX_DIMENSIONS + 1)];
+    CH_FLOAT A[(CONVHULL_3D_MAX_DIMENSIONS+1)*(CONVHULL_3D_MAX_DIMENSIONS+1)];
     int fVec[CONVHULL_3D_MAX_DIMENSIONS+1];
     int face_tmp[2];
     
