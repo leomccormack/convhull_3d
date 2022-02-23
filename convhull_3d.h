@@ -665,7 +665,7 @@ void convhull_3d_build_alloc
         /* Get the point that is not on the current face (point p) */
         for(i=0; i<d; i++)
             fVec[i] = faces[k*d+i];
-        sort_int(fVec, d); /* sort accending */
+        sort_int(fVec, d); /* sort ascending */
         p=k;
         for(i=0; i<d; i++)
             for(j=0; j<(d+1); j++)
@@ -1343,7 +1343,7 @@ void convhull_nd_build_alloc
         /* Get the point that is not on the current face (point p) */
         for(i=0; i<d; i++)
             fVec[i] = faces[k*d+i];
-        sort_int(fVec, d); /* sort accending */
+        sort_int(fVec, d); /* sort ascending */
         p=k;
         for(i=0; i<d; i++)
             for(j=0; j<(d+1); j++)
