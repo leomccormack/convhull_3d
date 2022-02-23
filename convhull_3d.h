@@ -242,6 +242,7 @@ void extract_vertices_from_obj_file_alloc(/* input arguments */
 #endif
 #ifndef ch_stateful_resize
     #define ch_stateful_resize(allocator, ptr, size) default_memory_resize(allocator, ptr, size)
+    #define CONVHULL_CREATE_DEFAULT_RESIZE 1
 #endif
 
 #define CH_MAX_NUM_FACES 50000
@@ -255,7 +256,6 @@ typedef struct float_w_idx {
 }float_w_idx;
 
 /* internal functions prototypes: */
-static void* default_memory_resize(void*, void*, size_t);
 static int cmp_asc_float(const void*, const void*);
 static int cmp_desc_float(const void*, const void*);
 static int cmp_asc_int(const void*, const void*);
@@ -267,12 +267,14 @@ static void plane_3d(CH_FLOAT*, CH_FLOAT*, CH_FLOAT*);
 static void ismember(int*, int*, int*, int, int);
 
 /* internal functions definitions: */
+#ifdef CONVHULL_CREATE_DEFAULT_RESIZE
 static void* default_memory_resize(void* allocator, void* ptr, size_t size)
 {
     if (ptr)
         ch_stateful_free(allocator, ptr);
     return ch_stateful_malloc(allocator, size);
 }
+#endif
 
 static int cmp_asc_float(const void *a,const void *b) {
     struct float_w_idx *a1 = (struct float_w_idx*)a;
