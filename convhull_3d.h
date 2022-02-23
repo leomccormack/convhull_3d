@@ -253,19 +253,13 @@ typedef struct float_w_idx {
     int idx;
 }float_w_idx;
 
-typedef struct int_w_idx {
-    int val;
-    int idx;
-}int_w_idx;
-
 /* internal functions prototypes: */
 static void* default_memory_resize(void*, void*, size_t);
 static int cmp_asc_float(const void*, const void*);
-static int cmp_desc_float(const void*, const void*);
 static int cmp_asc_int(const void*, const void*);
 static int cmp_desc_int(const void*, const void*);
 static void sort_float(CH_FLOAT*, CH_FLOAT*, int*, int, int, void*);
-static void sort_int(int*, int*, int*, int, int, void*);
+static void sort_int(int*, int);
 static ch_vec3 cross(ch_vec3*, ch_vec3*);
 static CH_FLOAT det_4x4(CH_FLOAT*);
 static void plane_3d(CH_FLOAT*, CH_FLOAT*, CH_FLOAT*);
@@ -296,18 +290,10 @@ static int cmp_desc_float(const void *a,const void *b) {
 }
 
 static int cmp_asc_int(const void *a,const void *b) {
-    struct int_w_idx *a1 = (struct int_w_idx*)a;
-    struct int_w_idx *a2 = (struct int_w_idx*)b;
-    if((*a1).val<(*a2).val)return -1;
-    else if((*a1).val>(*a2).val)return 1;
-    else return 0;
-}
-
-static int cmp_desc_int(const void *a,const void *b) {
-    struct int_w_idx *a1 = (struct int_w_idx*)a;
-    struct int_w_idx *a2 = (struct int_w_idx*)b;
-    if((*a1).val>(*a2).val)return -1;
-    else if((*a1).val<(*a2).val)return 1;
+    int *a1 = (int*)a;
+    int *a2 = (int*)b;
+    if((*a1)<(*a2))return -1;
+    else if((*a1)>(*a2))return 1;
     else return 0;
 }
 
@@ -346,35 +332,11 @@ static void sort_float
 
 static void sort_int
 (
-    int* in_vec,     /* vector[len] to be sorted */
-    int* out_vec,    /* if NULL, then in_vec is sorted "in-place" */
-    int* new_idices, /* set to NULL if you don't need them */
-    int len,         /* number of elements in vectors, must be consistent with the input data */
-    int descendFLAG, /* !1:ascending, 1:descending */
-    void* allocator  /* (stateful) allocator */
+    int* io_vec,     /* vector[len] to be sorted */
+    int len          /* number of elements in vectors, must be consistent with the input data */
 )
 {
-    int i;
-    struct int_w_idx *data;
-    
-    data = (int_w_idx*)ch_stateful_malloc(allocator, len*sizeof(int_w_idx));
-    for(i=0;i<len;i++) {
-        data[i].val=in_vec[i];
-        data[i].idx=i;
-    }
-    if(descendFLAG)
-        qsort(data,len,sizeof(data[0]),cmp_desc_int);
-    else
-        qsort(data,len,sizeof(data[0]),cmp_asc_int);
-    for(i=0;i<len;i++){
-        if (out_vec!=NULL)
-            out_vec[i] = data[i].val;
-        else
-            in_vec[i] = data[i].val; /* overwrite input vector */
-        if(new_idices!=NULL)
-            new_idices[i] = data[i].idx;
-    }
-    ch_stateful_free(allocator, data);
+    qsort(io_vec,len,sizeof(io_vec[0]),cmp_asc_int);
 }
 
 static ch_vec3 cross(ch_vec3* v1, ch_vec3* v2)
@@ -704,7 +666,7 @@ void convhull_3d_build_alloc
         /* Get the point that is not on the current face (point p) */
         for(i=0; i<d; i++)
             fVec[i] = faces[k*d+i];
-        sort_int(fVec, NULL, NULL, d, 0, allocator); /* sort accending */
+        sort_int(fVec, d); /* sort accending */
         p=k;
         for(i=0; i<d; i++)
             for(j=0; j<(d+1); j++)
@@ -876,7 +838,7 @@ void convhull_3d_build_alloc
                 vis = visible[j];
                 for(k=0; k<d; k++)
                     face_s[k] = faces[vis*d+k];
-                sort_int(face_s, NULL, NULL, d, 0, allocator);
+                sort_int(face_s, d);
                 ismember(nonvisible_faces, face_s, f0, num_nonvisible_faces*d, d);
                 u_len = 0;
                 
@@ -969,7 +931,7 @@ void convhull_3d_build_alloc
             for(k=start; k<nFaces; k++){
                 for(j=0; j<d; j++)
                     face_s[j] = faces[k*d+j];
-                sort_int(face_s, NULL, NULL, d, 0, allocator);
+                sort_int(face_s, d);
                 ismember(hVec, face_s, hVec_mem_face, nFaces, d);
                 num_p = 0;
                 for(j=0; j<nFaces; j++)
@@ -1393,7 +1355,7 @@ void convhull_nd_build_alloc
         /* Get the point that is not on the current face (point p) */
         for(i=0; i<d; i++)
             fVec[i] = faces[k*d+i];
-        sort_int(fVec, NULL, NULL, d, 0, allocator); /* sort accending */
+        sort_int(fVec, d); /* sort accending */
         p=k;
         for(i=0; i<d; i++)
             for(j=0; j<(d+1); j++)
@@ -1568,7 +1530,7 @@ void convhull_nd_build_alloc
                 vis = visible[j];
                 for(k=0; k<d; k++)
                     face_s[k] = faces[vis*d+k];
-                sort_int(face_s, NULL, NULL, d, 0, allocator);
+                sort_int(face_s, d);
                 ismember(nonvisible_faces, face_s, f0, num_nonvisible_faces*d, d);
                 u_len = 0;
 
@@ -1661,7 +1623,7 @@ void convhull_nd_build_alloc
             for(k=start; k<nFaces; k++){
                 for(j=0; j<d; j++)
                     face_s[j] = faces[k*d+j];
-                sort_int(face_s, NULL, NULL, d, 0, allocator);
+                sort_int(face_s, d);
                 ismember(hVec, face_s, hVec_mem_face, nFaces, d);
                 num_p = 0;
                 for(j=0; j<nFaces; j++)
