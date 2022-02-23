@@ -257,8 +257,8 @@ typedef struct float_w_idx {
 /* internal functions prototypes: */
 static void* default_memory_resize(void*, void*, size_t);
 static int cmp_asc_float(const void*, const void*);
+static int cmp_desc_float(const void*, const void*);
 static int cmp_asc_int(const void*, const void*);
-static int cmp_desc_int(const void*, const void*);
 static void sort_float(CH_FLOAT*, CH_FLOAT*, int*, int, int, void*);
 static void sort_int(int*, int);
 static ch_vec3 cross(ch_vec3*, ch_vec3*);
