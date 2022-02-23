@@ -476,7 +476,7 @@ static void plane_nd
     norm_c = (CH_FLOAT)0.0;
     for(i=0; i<Nd; i++)
         norm_c += (pow(c[i], 2.0));
-    norm_c = sqrt(norm_c);
+    norm_c = ch_sqrt(norm_c);
     for(i=0; i<Nd; i++)
         c[i] /= norm_c;
     (*d) = (CH_FLOAT)0.0;
@@ -885,8 +885,8 @@ void convhull_3d_build
             }
             
             /* Orient each new face properly */
-            hVec = (int*)ch_malloc( nFaces*sizeof(int));
-            hVec_mem_face = (int*)ch_malloc( nFaces*sizeof(int));
+            hVec = (int*)ch_malloc(nFaces*sizeof(int));
+            hVec_mem_face = (int*)ch_malloc(nFaces*sizeof(int));
             for(j=0; j<nFaces; j++)
                 hVec[j] = j;
             for(k=start; k<nFaces; k++){
@@ -1210,7 +1210,7 @@ void convhull_nd_build
     assert(d<=CONVHULL_ND_MAX_DIMENSIONS);
 
     /* Solution not possible... */
-    if(nVert<=d || in_vertices==NULL){
+    if(d>CONVHULL_ND_MAX_DIMENSIONS || nVert<=d || in_vertices==NULL){
         (*out_faces) = NULL;
         (*nOut_faces) = 0;
         if(out_cf!=NULL)
@@ -1346,7 +1346,7 @@ void convhull_nd_build
     desReldist = (CH_FLOAT*)ch_malloc((nVert-d-1) * sizeof(CH_FLOAT));
     for(i=0; i<(nVert-d-1); i++)
         for(j=0; j<d; j++)
-            reldist[i] += pow(absdist[i*d+j], 2.0);
+            reldist[i] += ch_pow(absdist[i*d+j], 2.0);
 
     /* Sort from maximum to minimum relative distance */
     int num_pleft, cnt;
@@ -1552,8 +1552,8 @@ void convhull_nd_build
             }
 
             /* Orient each new face properly */
-            hVec = (int*)ch_malloc( nFaces*sizeof(int));
-            hVec_mem_face = (int*)ch_malloc( nFaces*sizeof(int));
+            hVec = (int*)ch_malloc(nFaces*sizeof(int));
+            hVec_mem_face = (int*)ch_malloc(nFaces*sizeof(int));
             for(j=0; j<nFaces; j++)
                 hVec[j] = j;
             for(k=start; k<nFaces; k++){
@@ -1709,6 +1709,14 @@ void delaunay_nd_mesh
     cf = df = NULL;
     convhull_nd_build(projpoints, nPoints, nd+1, &hullfaces, &cf, &df, &nHullFaces);
 
+    /* Solution not possible... */
+    if(nd>CONVHULL_ND_MAX_DIMENSIONS || !hullfaces || !nHullFaces){
+        (*Mesh) = NULL;
+        (*nMesh) = 0;
+        ch_free(projpoints);
+        return;
+    }
+    
     /* Find the coordinates of the point with the maximum (N+1 dimension) coordinate (i.e. the w vector) */
 #ifdef CONVHULL_3D_USE_CBLAS
     if(sizeof(CH_FLOAT)==sizeof(double))
