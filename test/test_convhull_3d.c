@@ -22,6 +22,10 @@
 
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
+#include <direct.h>
+#define getcwd _getcwd
+#else
+#include <unistd.h>
 #endif
 
 /* Use the new convhull_nd_build() function (configured for 3d) instead of the original convhull_3d_build() */
@@ -29,11 +33,10 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <unistd.h>
 #define CONVHULL_3D_ENABLE
 //#define CONVHULL_3D_USE_SINGLE_PRECISION /* optional */
 //#define CONVHULL_3D_USE_CBLAS /* optional */
-#include "convhull_3d.h"
+#include "../convhull_3d.h"
 #include "uniform_sph.h"
 
 #ifndef M_PI
