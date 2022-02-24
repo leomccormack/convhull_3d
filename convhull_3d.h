@@ -539,14 +539,14 @@ static CH_FLOAT rnd(int x, int y)
     // - Improvements to the canonical one-liner GLSL rand() for OpenGL ES 2.0
     //   http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
     //
-    CH_FLOAT a  = 12.9898;
-    CH_FLOAT b  = 78.233;
-    CH_FLOAT c  = 43758.5453;
+    CH_FLOAT a  = (CH_FLOAT) 12.9898;
+    CH_FLOAT b  = (CH_FLOAT) 78.233;
+    CH_FLOAT c  = (CH_FLOAT) 43758.5453;
     CH_FLOAT dt = x*a + y*b;
 #ifdef CONVHULL_3D_USE_SINGLE_PRECISION
-    float sn = fmodf(dt, 3.14);
+    float sn = fmodf(dt, 3.14f);
     float intpart;
-    return modff(sin(sn) * c, &intpart);
+    return modff(sinf(sn) * c, &intpart);
 #else
     double sn = fmod(dt, 3.14);
     double intpart;
@@ -611,7 +611,7 @@ void convhull_3d_build_alloc
 
     /* Find the span */
     for(j=0; j<d; j++){
-        max_p = -2.23e+13; min_p = 2.23e+13;
+        max_p = (CH_FLOAT)-2.23e+13; min_p = (CH_FLOAT)2.23e+13;
         for(i=0; i<nVert; i++){
             max_p = MAX(max_p, points[i*(d+1)+j]);
             min_p = MIN(min_p, points[i*(d+1)+j]);
@@ -1290,7 +1290,7 @@ void convhull_nd_build_alloc
 
     /* Find the span */
     for(j=0; j<d; j++){
-        max_p = -2.23e+13; min_p = 2.23e+13;
+        max_p = (CH_FLOAT)-2.23e+13; min_p = (CH_FLOAT)2.23e+13;
         for(i=0; i<nVert; i++){
             max_p = MAX(max_p, points[i*(d+1)+j]);
             min_p = MIN(min_p, points[i*(d+1)+j]);
@@ -1759,7 +1759,7 @@ void delaunay_nd_mesh_alloc
     for(i = 0; i < nPoints; i++) {
         projpoints[i*(nd+1)+nd] = 0.0;
         for(j=0; j<nd; j++){
-            projpoints[i*(nd+1)+j] = (CH_FLOAT)points[i*nd+j] + 0.0000001*rnd(i, j);
+            projpoints[i*(nd+1)+j] = (CH_FLOAT)(points[i*nd+j] + 0.0000001*rnd(i, j));
             projpoints[i*(nd+1)+nd] += (projpoints[i*(nd+1)+j]*projpoints[i*(nd+1)+j]); /* w vector */
         }
     }
@@ -1784,8 +1784,8 @@ void delaunay_nd_mesh_alloc
     else
         maxW_idx = (int)cblas_isamax(nPoints, (float*)&projpoints[nd], nd+1);
 #else
-    float maxVal;
-    maxVal = -2.23e13;
+    CH_FLOAT maxVal;
+    maxVal = (CH_FLOAT)-2.23e13;
     maxW_idx = -1;
     for(i=0; i<nPoints; i++){
         if(projpoints[i*(nd+1)+nd]>maxVal){
@@ -1804,12 +1804,12 @@ void delaunay_nd_mesh_alloc
      * This is the point that can see the entire lower hull. */
     w_optimal = 0.0;
     for(j=0; j<nd; j++)
-       w_optimal += (2.0*ch_pow(p0[j], (CH_FLOAT)2.0));
+       w_optimal += ((CH_FLOAT)2.0*ch_pow(p0[j], (CH_FLOAT)2.0));
     w_optimal = w0-w_optimal;
 
     /* Subtract 1000 times the absolute value of w_optimal to ensure that the point where the tangent plane
      * crosses the w axis will see all points on the lower hull. This avoids numerical roundoff errors. */
-    w_optimal2=w_optimal-1000.0*fabs(w_optimal);
+    w_optimal2= (CH_FLOAT)(w_optimal-1000.0*fabs(w_optimal));
 
     /* Set the point where the tangent plane crosses the w axis */
     p = (CH_FLOAT*)ch_stateful_calloc(allocator, (nd+1),sizeof(CH_FLOAT));
