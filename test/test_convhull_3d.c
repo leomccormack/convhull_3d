@@ -303,7 +303,7 @@ int main(int argc, const char * argv[])
     
     /* results */
     char tmp_str[16];
-    printf("\nSucess rate: ");
+    printf("\nSuccess rate: ");
     sprintf(tmp_str, "%d", nSUCCEEDED);
     printf(tmp_str);
     printf("/");
