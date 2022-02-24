@@ -54,6 +54,7 @@ dkms.conf
 xcuserdata/
 
 test/output/*.m
+test/output/convhull_rand_sph.obj
 *.db
 test/test_convhull_3d/.vs/
 test/test_convhull_3d/Debug/
