@@ -111,8 +111,8 @@ int main(int argc, const char * argv[])
     ch_vertex* vertices;
     vertices = (ch_vertex*)malloc(n*sizeof(ch_vertex));
     for (i = 0; i < n; i++) {
-        float elev = rand()/(float)RAND_MAX * M_PI * 2.0;
-        float azi = rand()/(float)RAND_MAX * M_PI * 2.0;
+        double elev = rand()/(float)RAND_MAX * M_PI * 2.0;
+        double azi = rand()/(float)RAND_MAX * M_PI * 2.0;
         vertices[i].z = sin(elev);
         vertices[i].x = cos(azi) * cos(elev) * rand()/(float)RAND_MAX;
         vertices[i].y = sin(azi) * cos(elev) * rand()/(float)RAND_MAX;
