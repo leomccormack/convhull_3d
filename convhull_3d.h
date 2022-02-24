@@ -617,9 +617,12 @@ void convhull_3d_build_alloc
             min_p = MIN(min_p, points[i*(d+1)+j]);
         }
         span[j] = max_p - min_p;
-        /* If you hit this assertion error, then the input vertices do not span all 3 dimensions. Therefore the convex hull cannot be built.
-         * In these cases, reduce the dimensionality of the points and call convhull_nd_build() instead with d<3 */
-        assert(span[j]>0.0000001f);
+#ifndef CONVHULL_ALLOW_BUILD_IN_HIGHER_DIM
+        /* If you hit this assertion error, then the input vertices do not span all 3 dimensions. Therefore the convex hull could be built in less dimensions.
+         * In these cases, consider reducing the dimensionality of the points and calling convhull_nd_build() instead with d<3
+         * You can turn this assert off using CONVHULL_ALLOW_BUILD_IN_HIGHER_DIM if you still wish to build in a higher number of dimensions. */
+        assert(span[j]>0.000000001);
+#endif
     }
     
     /* The initial convex hull is a simplex with (d+1) facets, where d is the number of dimensions */
@@ -1296,9 +1299,12 @@ void convhull_nd_build_alloc
             min_p = MIN(min_p, points[i*(d+1)+j]);
         }
         span[j] = max_p - min_p;
-        /* If you hit this assertion error, then the input vertices do not span all 'd' dimensions. Therefore the convex hull cannot be built.
-         * In these cases, reduce the dimensionality of the points and call convhull_nd_build() instead with d<3 */
+#ifndef CONVHULL_ALLOW_BUILD_IN_HIGHER_DIM
+        /* If you hit this assertion error, then the input vertices do not span all 'd' dimensions. Therefore the convex hull could be built in less dimensions.
+         * In these cases, consider reducing the dimensionality of the points and calling convhull_nd_build() with a smaller d
+         * You can turn this assert off using CONVHULL_ALLOW_BUILD_IN_HIGHER_DIM if you still wish to build in a higher number of dimensions. */
         assert(span[j]>0.000000001);
+#endif
     }
 
     /* The initial convex hull is a simplex with (d+1) facets, where d is the number of dimensions */
