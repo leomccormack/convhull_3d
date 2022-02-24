@@ -415,7 +415,7 @@ static void plane_3d
     }
     norm_c = (CH_FLOAT)0.0;
     for(i=0; i<3; i++)
-        norm_c += (ch_pow(c[i], 2.0));
+        norm_c += (ch_pow(c[i], (CH_FLOAT)2.0));
     norm_c = ch_sqrt(norm_c);
     for(i=0; i<3; i++)
         c[i] /= norm_c;
@@ -475,7 +475,7 @@ static void plane_nd
     }
     norm_c = (CH_FLOAT)0.0;
     for(i=0; i<Nd; i++)
-        norm_c += (pow(c[i], 2.0));
+        norm_c += (ch_pow(c[i], (CH_FLOAT)2.0));
     norm_c = ch_sqrt(norm_c);
     for(i=0; i<Nd; i++)
         c[i] /= norm_c;
@@ -679,7 +679,7 @@ void convhull_3d_build
     desReldist = (CH_FLOAT*)ch_malloc((nVert-d-1) * sizeof(CH_FLOAT));
     for(i=0; i<(nVert-d-1); i++)
         for(j=0; j<d; j++)
-            reldist[i] += ch_pow(absdist[i*d+j], 2.0);
+            reldist[i] += ch_pow(absdist[i*d+j], (CH_FLOAT)2.0);
     
     /* Sort from maximum to minimum relative distance */
     int num_pleft, cnt;
@@ -1346,7 +1346,7 @@ void convhull_nd_build
     desReldist = (CH_FLOAT*)ch_malloc((nVert-d-1) * sizeof(CH_FLOAT));
     for(i=0; i<(nVert-d-1); i++)
         for(j=0; j<d; j++)
-            reldist[i] += ch_pow(absdist[i*d+j], 2.0);
+            reldist[i] += ch_pow(absdist[i*d+j], (CH_FLOAT)2.0);
 
     /* Sort from maximum to minimum relative distance */
     int num_pleft, cnt;
@@ -1744,7 +1744,7 @@ void delaunay_nd_mesh
      * This is the point that can see the entire lower hull. */
     w_optimal = 0.0;
     for(j=0; j<nd; j++)
-       w_optimal += (2.0*pow(p0[j], 2.0));
+       w_optimal += (2.0*ch_pow(p0[j], (CH_FLOAT)2.0));
     w_optimal = w0-w_optimal;
 
     /* Subtract 1000 times the absolute value of w_optimal to ensure that the point where the tangent plane
