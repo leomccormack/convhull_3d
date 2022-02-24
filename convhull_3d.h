@@ -591,7 +591,7 @@ void convhull_3d_build_alloc
     CH_FLOAT p_s[CONVHULL_3D_MAX_DIMENSIONS*CONVHULL_3D_MAX_DIMENSIONS];
     CH_FLOAT* points, *cf, *df;
     
-    if(nVert<3 || in_vertices==NULL){
+    if(nVert<=3 || in_vertices==NULL){
         (*out_faces) = NULL;
         (*nOut_faces) = 0;
         return;
