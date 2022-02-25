@@ -22,6 +22,10 @@
 
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
+#include <direct.h>
+#define getcwd _getcwd
+#else
+#include <unistd.h>
 #endif
 
 /* Use the new convhull_nd_build() function (configured for 3d) instead of the original convhull_3d_build() */
@@ -29,11 +33,10 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <unistd.h>
 #define CONVHULL_3D_ENABLE
 //#define CONVHULL_3D_USE_SINGLE_PRECISION /* optional */
 //#define CONVHULL_3D_USE_CBLAS /* optional */
-#include "convhull_3d.h"
+#include "../convhull_3d.h"
 #include "uniform_sph.h"
 
 #ifndef M_PI
@@ -108,8 +111,8 @@ int main(int argc, const char * argv[])
     ch_vertex* vertices;
     vertices = (ch_vertex*)malloc(n*sizeof(ch_vertex));
     for (i = 0; i < n; i++) {
-        float elev = rand()/(float)RAND_MAX * M_PI * 2.0;
-        float azi = rand()/(float)RAND_MAX * M_PI * 2.0;
+        double elev = rand()/(float)RAND_MAX * M_PI * 2.0;
+        double azi = rand()/(float)RAND_MAX * M_PI * 2.0;
         vertices[i].z = sin(elev);
         vertices[i].x = cos(azi) * cos(elev) * rand()/(float)RAND_MAX;
         vertices[i].y = sin(azi) * cos(elev) * rand()/(float)RAND_MAX;
@@ -303,7 +306,7 @@ int main(int argc, const char * argv[])
     
     /* results */
     char tmp_str[16];
-    printf("\nSucess rate: ");
+    printf("\nSuccess rate: ");
     sprintf(tmp_str, "%d", nSUCCEEDED);
     printf(tmp_str);
     printf("/");
