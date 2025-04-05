@@ -730,7 +730,8 @@ void convhull_3d_build_alloc
     int num_pleft, cnt;
     int* ind, *pleft;
     ind = (int*)ch_stateful_malloc(allocator, (nVert-d-1) * sizeof(int));
-    pleft = (int*)ch_stateful_malloc(allocator, (nVert-d-1) * sizeof(int));
+    if ((nVert-d-1)!=0)
+        pleft = (int*)ch_stateful_malloc(allocator, (nVert-d-1) * sizeof(int));
     sort_float(reldist, desReldist, ind, (nVert-d-1), 1, allocator);
     
     /* Initialize the vector of points left. The points with the larger relative
